@@ -1,0 +1,45 @@
+{include file="header" /}
+<div class="container">
+  <form action="/search/keyword/" id="search-form">  
+    <div class="form-group">
+      <input type="date" class="form-control" value="{$Request.get.start}" name="start" id="start" placeholder="开始日期">
+    </div>  
+    <div class="form-group">
+      <input type="date" class="form-control" value="{$Request.get.end}" name="end" id="end" placeholder="结束日期">
+    </div>      
+  <div class="input-group mb-3">
+    <input type="search" id="keyword" name="keyword" value="{$Request.get.keyword}" class="form-control" placeholder="关键字">
+    <div class="input-group-append">
+      <button class="btn btn-success" type="submit">Go</button>  
+     </div>
+  </div>
+  </form>
+  <ul class="list-group">
+{volist name="list" id="item" }  
+    {if condition="$item.type == 1"}
+    <li class="list-group-item"><article><a href="{$item.url}" target="_blank"><time>{$item.date}</time></a><p>{$item.content}</p></article></li>
+    {elseif condition="$item.type == 3"/}
+    <li class="list-group-item"><article><a href="{$item.url}" target="_blank"><time>{$item.date}</time></a><p>{$item.content}</p></article></li>
+    {else}
+    <li class="list-group-item"><section><a href="{$item.url}" target="_blank"><time>{$item.date}</time></a><p>{$item.title}</p>
+    {present name="item.num_json"}<p>{foreach $item.num_json as $nj} <span>{$nj}</span> {/foreach}</p>{/present}
+    <p>{$item.data_tag}</p></section></li>
+    {/if}
+{/volist}
+  </ul>
+  {$list->render()}
+</div>
+{include file="footer" /}
+<script>
+$(document).ready(function(){
+    $("form").submit(function(e){
+        e.preventDefault();
+        var start = $.trim($('#start').val());
+        var end = $.trim($('#end').val());
+        var url = $(this).attr('action')+encodeURI($('#keyword').val())+'/'+encodeURI($('#start').val())+'/'+encodeURI($('#end').val());
+        location.href = url;
+    });
+});
+</script>
+</body>
+</html>
