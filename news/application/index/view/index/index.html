@@ -1,27 +1,35 @@
 {include file="header" /}
 <div class="container">
-  <form action="/search/keyword/" id="search-form">  
+  <form role="form" class="form-horizontal" action="/search" id="search-form" method="get">  
     <div class="form-group">
-      <input type="date" class="form-control" value="{$Request.get.start}" name="start" id="start" placeholder="开始日期">
+      <div class="col-lg-12">  
+        <input type="date" class="form-control" value="{$Request.get.start}" name="start" id="start" placeholder="开始日期">
+      </div>
     </div>  
     <div class="form-group">
-      <input type="date" class="form-control" value="{$Request.get.end}" name="end" id="end" placeholder="结束日期">
-    </div>      
-  <div class="input-group mb-3">
-    <input type="search" id="keyword" name="keyword" value="{$Request.get.keyword}" class="form-control" placeholder="关键字">
-    <div class="input-group-append">
-      <button class="btn btn-success" type="submit">Go</button>  
-     </div>
-  </div>
+        <div class="col-lg-12">
+            <input type="date" class="form-control" value="{$Request.get.end}" name="end" id="end" placeholder="结束日期">
+        </div>    
+    </div>     
+    <div class="form-group">
+        <div class="col-lg-12">
+            <div class="input-group">
+                <input type="search" id="keyword" name="keyword" value="{$Request.get.keyword}" class="form-control">
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="submit">搜索</button>
+                </span>
+            </div><!-- /input-group -->
+        </div><!-- /.col-lg-6 -->    
+    </div> 
   </form>
   <ul class="list-group">
 {volist name="list" id="item" }  
     {if condition="$item.type == 1"}
-    <li class="list-group-item"><article><a href="{$item.url}" target="_blank"><time>{$item.date}</time></a><p>{$item.content}</p></article></li>
+    <li class="list-group-item"><article><a href="{$item.url}" target="_blank"><time>{$item.date}</time></a><p></p><p>{$item.content}</p>{notempty name="item.img"}<p><a href="{$item.img}" target="_blank">{$item.img}</a></p>{/notempty}</article></li>
     {elseif condition="$item.type == 3"/}
-    <li class="list-group-item"><article><a href="{$item.url}" target="_blank"><time>{$item.date}</time></a><p>{$item.content}</p></article></li>
+    <li class="list-group-item"><article><a href="{$item.url}" target="_blank"><time>{$item.date}</time></a><p></p><p>{$item.content}</p></article></li>
     {else}
-    <li class="list-group-item"><section><a href="{$item.url}" target="_blank"><time>{$item.date}</time></a><p>{$item.title}</p>
+    <li class="list-group-item"><section><a href="{$item.url}" target="_blank"><time>{$item.date}</time></a><p></p><p>{$item.title}</p>
     {present name="item.num_json"}<p>{foreach $item.num_json as $nj} <span>{$nj}</span> {/foreach}</p>{/present}
     <p>{$item.data_tag}</p></section></li>
     {/if}
@@ -32,13 +40,13 @@
 {include file="footer" /}
 <script>
 $(document).ready(function(){
-    $("form").submit(function(e){
-        e.preventDefault();
-        var start = $.trim($('#start').val());
-        var end = $.trim($('#end').val());
-        var url = $(this).attr('action')+encodeURI($('#keyword').val())+'/'+encodeURI($('#start').val())+'/'+encodeURI($('#end').val());
-        location.href = url;
-    });
+    {if condition="$Request.get.keyword"}
+        $.each($('.list-group-item'),function(i,n){
+            var content = $(n).html();
+            var values = content.split('{$Request.get.keyword}');
+            $(n).html(values.join('<span style="background:yellow;">{$Request.get.keyword}</span>'));
+        });
+    {/if}
 });
 </script>
 </body>

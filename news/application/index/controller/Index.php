@@ -19,26 +19,29 @@ class Index extends Controller
     
     public function search()
     {
-        $data = input('get.');
         $data['keyword'] = input('keyword'); 
         $data['start'] = input('start'); 
         $data['end'] = input('end'); 
-        $validate = new Validate(['keyword' => 'require','start' => 'date','end' => 'date']);
+    
+        $validate = new Validate(['start' => 'date','end' => 'date|gt:start']);
         $result = $validate->check($data);
         if ($result != 1) {
             $this->error($validate->getError());
         } 
+
         $query = Db::name('news')->where('content','like',$data['keyword']);
         if($data['start'])
         {
-            $query = $query->where('date','>',$data['start']);
+            $query = $query->where('date','>=',$data['start']);
         }
         if($data['end'])
         {
             $query = $query->where('date','<',$data['end']);
         }        
-        $list = $query->order('date','desc')->paginate(config('paginate.list_rows'),true)
-       ->each(function($item, $key){
+        $list = $query->order('date','desc')->paginate(config('paginate.list_rows'),false,[
+            'query'     => $data
+        ])
+        ->each(function($item, $key){
             return $this->_format_list($item, $key);
         });
         $this->assign('list', $list);

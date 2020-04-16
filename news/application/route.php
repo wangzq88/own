@@ -11,13 +11,12 @@
 
 return [
     '__pattern__' => [
-        'name' => '\w+',
+        'name' => '\w+'
     ],
-    'search/keyword/[:keyword]/[:start]/[:end]' => 'index/index/search',
-    'news/create' => 'index/news/create',     
+    'search' => 'index/Index/search',
+    'news/create' => 'index/News/create',     
     '[hello]'     => [
         ':id'   => ['index/hello', ['method' => 'get'], ['id' => '\d+']],
         ':name' => ['index/hello', ['method' => 'post']],
     ],
-
 ];
