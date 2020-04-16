@@ -3,26 +3,36 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.common.exceptions import NoSuchElementException
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import NoSuchElementException,TimeoutException,StaleElementReferenceException
 import pymongo
 import json
 import time
-
-client = pymongo.MongoClient('mongodb://localhost:27017/')
-db = client["test"]
-col = db["news"]  
-browser = webdriver.Chrome()
-try:
-    browser.get('https://www.jin10.com/')
-    WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'jin-flash_wrap')))
-    i = 0
-    while i < 200 :
-        browser.find_element_by_id('J_flashMoreBtn').click()
-        time.sleep(30)
-        i += 1
-    commentList = browser.find_elements_by_class_name('J_flash_item')
-    for c in commentList:
+import sys       
+def splider(browser,col):
+    fo = open("jshistoty.txt", "r")
+    content = fo.read()
+    fo.close()
+    if content.strip() != '':
+        content = json.loads(content)
+        first = content['first_news_id']
+        last = content['last_news_id']
+    commentList = browser.find_elements_by_css_selector('.J_flash_wrap > .J_flash_item')
+    for i in range(len(commentList)):     
+        c = commentList[i]
+        try:
+            id = c.get_attribute('id')
+        except StaleElementReferenceException:
+            break
+        if i == 0:
+            begin = id
+        if len(commentList) - 1 == i :
+            end = id               
+        if id == None :
+            continue  
+        if 'first' in locals().keys() and 'last' in locals().keys() and id <= first and id >= last :
+            browser.execute_script('$("#'+id+'").remove()');
+            continue
+  
         dict = {'type':1,'source':'jinshi','ext':0}
         dict['date'] = c.get_attribute('data-id')
         dict['url'] = c.find_element_by_css_selector('div.jin-flash_h > div.jin-flash_icon > a').get_attribute('href')
@@ -76,12 +86,35 @@ try:
             dict['content'] = dict['new_content']
             del dict['new_content']
         print(dict)    
-        if isNew :
-            x = col.insert_one(dict)    
-    for c in commentList:
-        browser.execute_async_script('var wrap=document.getElementById("'+c.get_attribute('id')+'").parentNode;console.dir(wrap);for(i=1;i<wrap.childNodes.length;i++){wrap.removeChild(wrap.childNodes[i]);console.dir(wrap.childNodes[i]);}')
+        if (isNew):
+            x = col.insert_one(dict)
+        if 'begin' in locals().keys() and 'end' in locals().keys() :
+            new = {'first_news_id':begin,'last_news_id':end}
+            print(new)
+            fo = open("jshistoty.txt", "w")
+            fo.write(json.dumps(new))
+            fo.close()
+            
+client = pymongo.MongoClient('mongodb://localhost:27017/')
+db = client["test"]
+col = db["news"]  
+browser = webdriver.Chrome()
+try:
+    browser.get('https://www.jin10.com/')
+    WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'jin-flash_wrap')))
+    j = 0
+    while j < 10:
+        browser.find_element_by_id('J_flashMoreBtn').click()
+        time.sleep(15)
+        j += 1
+        if j <= 0:
+            continue
+        splider(browser,col) 
+        browser.execute_script('$(function(){var wrap_list = $("#J_flashList .jin-flash_wrap");var wrap_length = wrap_list.length;console.log(wrap_length);if(wrap_length > 2){wrap_list.each(function(i,e){if(i == 0 || i == wrap_length - 1)return true;$(e).remove();});}});')        
 except TimeoutException:
     print('超时')
 except NoSuchElementException:
     print('查找不到元素')
-  
+finally:    
+    pass
+        

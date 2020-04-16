@@ -16,6 +16,8 @@ mycol = mydb["news"]
 driver = webdriver.Chrome()
 df = pd.read_excel("pengbo.xlsx")
 for row in df.values :
+    if row[2] == 1:
+        continue
     url = row[1]
     driver.get(url)
     WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'rich_media_content')))

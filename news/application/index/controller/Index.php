@@ -56,6 +56,13 @@ class Index extends Controller
         }   
         else
         {
+            if ($item['type'] == 1) 
+            {
+                $item['content'] = preg_replace_callback("@[a-zA-z]+://[^\s]*@i",function($matches){
+                    return '<a href="'.$matches[0].'" target="_blank">'.$matches[0].'</a>';
+                },$item['content']);
+                
+            }
             $item['content'] = mb_strlen($item['content']) > 300 ? mb_substr($item['content'],0,300).'……':$item['content'];     
         }
         return $item;
