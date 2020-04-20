@@ -45,26 +45,24 @@ class Index extends Controller
             return $this->_format_list($item, $key);
         });
         $this->assign('list', $list);
+        $this->assign('breadcrumb', [['title' => '搜索']]);
+        $this->assign('bclen', 1);
         return $this->fetch('index');        
     }
 
     private function _format_list($item,$key)
     {
-        if($item['type'] == 2 && isset($item['num_json']))
+        if ($item['type'] == 1) 
         {
-            $item['num_json'] = json_decode($item['num_json']);
-        }   
-        else
-        {
-            if ($item['type'] == 1) 
-            {
-                $item['content'] = preg_replace_callback("@[a-zA-z]+://[^\s]*@i",function($matches){
-                    return '<a href="'.$matches[0].'" target="_blank">'.$matches[0].'</a>';
-                },$item['content']);
-                
-            }
-            $item['content'] = mb_strlen($item['content']) > 300 ? mb_substr($item['content'],0,300).'……':$item['content'];     
+            $item['content'] = preg_replace_callback("@[a-zA-z]+://[^\s]*@i",function($matches){
+                return '<a href="'.$matches[0].'" target="_blank">'.$matches[0].'</a>';
+            },$item['content']);
         }
+        if ($item['type'] == 3) 
+        {
+            $item['content'] = mb_strlen($item['content']) > 300 ? mb_substr($item['content'],0,300).'……':$item['content'];                 
+        }
+ 
         return $item;
     }
     

@@ -31,15 +31,11 @@ for row in df.values :
         list = driver.find_elements_by_css_selector('.list-paddingleft-2')
         for i in range(len(list)):
             childList = list[i].find_elements_by_tag_name('li')
-            if(i in (0, 1)):
-                type = 1
-            else:
-                type = 2
             for child in childList:
                 myquery = {"content": child.text,"date":date}
                 x = mycol.find_one(myquery)
                 if(x == None):
-                    mydict = { "type": type,"content": child.text, "date": date, "url": url,"ext": 0,"source": "pengbo" }
+                    mydict = { "type": 1,"content": child.text, "date": date, "url": url,"ext": 0,"source": "pengbo" }
                     x = mycol.insert_one(mydict)
     except NoSuchElementException:
         print("Oops!  That was no valid number.  Try again   ")
