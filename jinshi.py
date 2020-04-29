@@ -8,6 +8,7 @@ import pymongo
 import json
 import time
 import sys       
+
 def splider(browser,col):
     fo = open("jshistoty.txt", "r")
     content = fo.read()
@@ -51,14 +52,20 @@ def splider(browser,col):
                 dict['ext'] = 1 if len(remarkList) > 0 else 0
                 for remark in remarkList:
                     remark.find_element_by_css_selector('.jin-icon_remark-link').click() 
-                    browser.implicitly_wait(3) 
-                    for handle in browser.window_handles:
-                        browser.switch_to.window(handle)		
-                        if browser.current_url != 'https://www.jin10.com/':
-                            #添加链接
-                            dict['new_content'] = dict['content'] + "\n" + browser.current_url
-                            browser.close()
-                            browser.switch_to.window(browser.window_handles[0])	
+                    try:
+                        browser.implicitly_wait(3) 
+                    except TimeoutException:
+                        raise
+                    finally:    
+                        for handle in browser.window_handles:
+                            browser.switch_to.window(handle)		
+                            if browser.current_url != 'https://www.jin10.com/':
+                                #添加链接
+                                dict['new_content'] = dict['content'] + "\n" + browser.current_url
+                                browser.close()
+                                browser.switch_to.window(browser.window_handles[0])	
+            except TimeoutException:
+                break
             except (NoSuchElementException,ElementClickInterceptedException,StaleElementReferenceException):
                 pass             
             try:
@@ -68,14 +75,14 @@ def splider(browser,col):
             isNew = True
             for x in col.find({"date":dict['date']}):
                 if ((x['type'] == 1 and 'new_content' not in dict and dict['type'] == 1 and x['content'] == dict['content']) 
-                    or (x['type'] == 1 and 'new_content' in dict and dict['type'] == 1 and x['content'] == dict['new_content']) 
-                    or (x['type'] == 2 and x['title'] == dict['title'])):
+                    or (x['type'] == 1 and 'new_content' in dict and dict['type'] == 1 and (x['content'] == dict['new_content'] or x['content'] == dict['content']))
+                    or (x['type'] == 2 and 'title' in dict and x['title'] == dict['title'])):
                     print(x) 
                     if ('new_content' in dict and x['content'] != dict['new_content']):
                         newvalues = {'$set':{'content':dict['new_content']}}
                         col.update_one({"_id":x['_id']}, newvalues)                  
     #                dict['content'] = dict['new_content'] if 'new_content' in dict else dict['content']
-                    if(('img' not in x or x['img'] != dict['img']) and 'img' in dict):
+                    if('img' in dict and ('img' not in x or x['img'] != dict['img'])):
                         newvalues = {'$set':{"img":dict['img'].strip(),'ext':dict['ext']}}
                         col.update_one({"_id":x['_id']}, newvalues)                        
                     if(('url' not in x or x['url'].isspace()) and 'url' in dict):
@@ -109,15 +116,21 @@ try:
     WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'jin-flash_wrap')))
     j = 0
     while True:
-        browser.find_element_by_id('J_flashMoreBtn').click()
-        time.sleep(20)
+        try:
+            browser.find_element_by_id('J_flashMoreBtn').click()
+        except ElementClickInterceptedException:
+            print('不可点击')           
+        except NoSuchElementException:  
+            for handle in browser.window_handles:
+                browser.switch_to.window(handle)		
+                if browser.current_url != 'https://www.jin10.com/':
+                    browser.close()
+                    browser.switch_to.window(browser.window_handles[0])	             
+        time.sleep(3)
         j += 1
         if j <= 1:
             continue
         splider(browser,col) 
         browser.execute_script('$(function(){var wrap_list = $("#J_flashList .jin-flash_wrap");var wrap_length = wrap_list.length;console.log(wrap_length);if(wrap_length > 2){wrap_list.each(function(i,e){if(i == 0 || i == wrap_length - 1)return true;$(e).remove();});}});')        
 except TimeoutException:
-    print('超时')
-except NoSuchElementException:
-    print('查找不到元素')    
-        
+    print('超时')   
