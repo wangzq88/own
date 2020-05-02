@@ -57,13 +57,14 @@ def splider(browser,col):
                     except TimeoutException:
                         raise
                     finally:    
-                        for handle in browser.window_handles:
-                            browser.switch_to.window(handle)		
-                            if browser.current_url != 'https://www.jin10.com/':
-                                #添加链接
-                                dict['new_content'] = dict['content'] + "\n" + browser.current_url
-                                browser.close()
-                                browser.switch_to.window(browser.window_handles[0])	
+                        if len(browser.window_handles) > 1:
+                            for handle in browser.window_handles:
+                                browser.switch_to.window(handle)		
+                                if browser.current_url != 'https://www.jin10.com/':
+                                    #添加链接
+                                    dict['new_content'] = dict['content'] + "\n" + browser.current_url
+                                    browser.close()
+                                    browser.switch_to.window(browser.window_handles[0])	
             except TimeoutException:
                 break
             except (NoSuchElementException,ElementClickInterceptedException,StaleElementReferenceException):
@@ -112,24 +113,21 @@ db = client["test"]
 col = db["news"]  
 browser = webdriver.Chrome()
 try:
-    browser.get('https://www.jin10.com/')
+    browser.get('https://www.jin10.com')
     WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.CLASS_NAME, 'jin-flash_wrap')))
-    j = 0
     while True:
         try:
             browser.find_element_by_id('J_flashMoreBtn').click()
         except ElementClickInterceptedException:
             print('不可点击')           
         except NoSuchElementException:  
-            for handle in browser.window_handles:
-                browser.switch_to.window(handle)		
-                if browser.current_url != 'https://www.jin10.com/':
-                    browser.close()
-                    browser.switch_to.window(browser.window_handles[0])	             
-        time.sleep(3)
-        j += 1
-        if j <= 1:
-            continue
+            if len(browser.window_handles) > 1:
+                for handle in browser.window_handles:
+                    browser.switch_to.window(handle)		
+                    if browser.current_url != 'https://www.jin10.com/':
+                        browser.close()
+                        browser.switch_to.window(browser.window_handles[0])	             
+        time.sleep(2)
         splider(browser,col) 
         browser.execute_script('$(function(){var wrap_list = $("#J_flashList .jin-flash_wrap");var wrap_length = wrap_list.length;console.log(wrap_length);if(wrap_length > 2){wrap_list.each(function(i,e){if(i == 0 || i == wrap_length - 1)return true;$(e).remove();});}});')        
 except TimeoutException:
