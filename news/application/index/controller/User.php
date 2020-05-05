@@ -16,6 +16,8 @@ class User extends Controller
     {
         $get = input('get.');
         $this->assign('get', $get);
+        $this->assign('breadcrumb', [['title' => '登录']]);
+        $this->assign('bclen', 1);        
         return $this->fetch(); 
     }    
     

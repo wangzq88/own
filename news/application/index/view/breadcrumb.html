@@ -1,0 +1,8 @@
+<ul class="breadcrumb">
+	<li><a href="/">首页</a></li>
+    {present name="breadcrumb"}
+        {volist name="breadcrumb" id="crumb" key="i"} 
+        <li {if condition="$bclen == $i"}class="active"{/if}>{if condition="$bclen > $i"}<a href="{$crumb.url}">{$crumb.title}</a>{else}{$crumb.title}{/if}</li>
+        {/volist}
+    {/present}
+</ul>

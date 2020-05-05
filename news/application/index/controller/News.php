@@ -14,6 +14,8 @@ class News extends Controller
     
     public function create()
     {
+        $this->assign('breadcrumb', [['title' => '添加资讯']]);
+        $this->assign('bclen', 1);
         return $this->fetch(); 
     }
     

@@ -13,8 +13,8 @@ return [
     '__pattern__' => [
         'name' => '\w+'
     ],
-    'search' => 'index/Index/search',
-    'news/create' => 'index/News/create',     
+    'search' => ['index/Index/search',['ext'=>'php']],
+    'news/create' => ['index/News/create',['ext'=>'php']],     
     '[hello]'     => [
         ':id'   => ['index/hello', ['method' => 'get'], ['id' => '\d+']],
         ':name' => ['index/hello', ['method' => 'post']],
