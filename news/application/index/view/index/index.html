@@ -26,11 +26,11 @@
   <ul class="list-group">
 {volist name="list" id="item" }  
     {if condition="$item.type == 1"}
-    <li class="list-group-item"><article><a href="{$item.url}" target="_blank"><time>{$item.date}</time></a><p></p><p>{$item.content}</p>{notempty name="item.img"}<p><a href="{$item.img}" target="_blank">{$item.img}</a></p>{/notempty}</article></li>
+    <li class="list-group-item"><article class="list-group-item-text"><a href="{$item.url}" target="_blank"><time>{$item.date}</time></a><p></p><p>{$item.content}</p>{notempty name="item.img"}<p><a href="{$item.img}" target="_blank">{$item.img}</a></p>{/notempty}</article></li>
     {elseif condition="$item.type == 3"/}
-    <li class="list-group-item"><article><a href="{$item.url}" target="_blank"><time>{$item.date}</time></a><p></p><p>{$item.content}</p></article></li>
+    <li class="list-group-item"><article class="list-group-item-text"><a href="{$item.url}" target="_blank"><time>{$item.date}</time></a><p></p><p>{$item.content}</p></article></li>
     {else}
-    <li class="list-group-item"><section><a href="{$item.url}" target="_blank"><time>{$item.date}</time></a><p></p><p>{$item.title}</p>
+    <li class="list-group-item"><section class="list-group-item-text"><a href="{$item.url}" target="_blank"><time>{$item.date}</time></a><p></p><p>{$item.title}</p>
     {present name="item.num_json"}<p>{foreach $item.num_json as $nj} <span>{$nj}</span> {/foreach}</p>{/present}
     <p>{$item.data_tag}</p></section></li>
     {/if}

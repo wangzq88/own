@@ -26,7 +26,7 @@ class User extends Controller
         $code = 1; 
         $info = '用户名或者密码错误';         
         $data = input('post.');        
-        if($data['email'] == '751446682@qq.com' && $data['pwd'] == '123456@abcdef')
+        if($data['email'] == '751446682@qq.com' && $data['pwd'] == '123456')
         {
             Session::set('user_id','1');
             $code = 0; 
