@@ -1,0 +1,2 @@
+[2020-11-23 09:34:53] sql.INFO: [4.21] select `column_key`, `column_name`, `data_type`, `column_comment`, `extra`, `column_type` from information_schema.columns where `table_schema` = 'cms' and `table_name` = 'central_bank_assets' order by ORDINAL_POSITION [] []
+[2020-11-23 10:00:45] sql.INFO: [2.45] select * from `central_bank_assets` [] []
