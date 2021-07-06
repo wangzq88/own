@@ -3,7 +3,7 @@
         <view class="safe-area-inset-bottom">
           <!-- 地址、商户、配送、商品、优惠、费用信息 -->
           <view class="page" v-if="previewData">
-            <view v-if="!previewData.hasCity && previewData.show_address !== false && previewData.hasRecipient" class="group">
+            <view v-if="!previewData.hasCity && previewData.show_address !== false && previewData.hasRecipient && previewData.is_send != 2" class="group">
               <app-address-bar :address="previewData.address" :has-ziti="previewData.has_ziti" :all-ziti="previewData.allZiti" @address-input="handleAddressInput"></app-address-bar>
             </view>
             <template v-for="(mch, mchIndex) in previewData.mch_list" >
@@ -74,7 +74,7 @@
                   </template><!-- 自提门店信息end -->
                 </view>
                 <view class="line"></view>
-                <view v-if="mch.show_delivery !== false" style="padding: 18rpx 32rpx;">
+                <view v-if="mch.show_delivery !== false && previewData.is_send != 2" style="padding: 18rpx 32rpx;">
                   <!-- 选择配送方式start -->
                   <view class="dir-left-nowrap cross-center" style="padding: 18rpx 0;">
                     <view class="box-grow-0">
@@ -226,7 +226,7 @@
                   </view>
                   <view class="line"></view>
                 </template>
-                <template v-if="mch.show_express_price !== false">
+                <template v-if="mch.show_express_price !== false && previewData.is_send != 2">
                   <!-- 运费信息start -->
                   <view class="dir-left-nowrap cross-center" style="height: 84rpx; padding: 0 32rpx;">
                     <view class="box-grow-1">运费</view>
@@ -243,7 +243,8 @@
                 <template v-if="
                     !(mch.order_form && mch.order_form.status == '1')
                     && mch.show_remark !== false
-                    && mch.has_goods_form !== true">
+                    && mch.has_goods_form !== true
+					&& previewData.is_send != 2">
                   <view class="line"></view>
                   <view class="row" style="padding-top: 0;padding-bottom: 0;">
                     <app-input @input="inputRemark(mchIndex)" v-model="mch.remark" placeholder="买家留言" padding-left="0" height="100"></app-input>
@@ -395,6 +396,7 @@ export default {
             is_open: false,
             mchList: '',
             p_pay_id: '',//重新提交处理
+			sign:null
         };
     },
     computed: {
@@ -426,6 +428,7 @@ export default {
                 list.push(item.mch_id)
             }
         }
+		
         this.is_gift = this.userTheme && this.userTheme.indexOf('gift') >= 0 ? true : false;
         this.mchList = list.length > 0 ? JSON.stringify(list) : '0';
         if (this.submitLock) return;
@@ -564,6 +567,7 @@ export default {
             this.payDataUrl = decodeURIComponent(options.pay_data_url || this.$api.order.pay_data);
             this.payCancelUrl = options.pay_cancel_url ? decodeURIComponent(options.pay_cancel_url) : null;
             this.showPayResult = options.show_pay_result || true;
+			this.sign = options.sign || null;
             if (this.showPayResult === 'true') this.showPayResult = true;
             if (this.showPayResult === 'false') this.showPayResult = false;
             const list = JSON.parse(options.mch_list);
@@ -595,7 +599,8 @@ export default {
             this.$store.commit('orderSubmit/mutSetFormData', {
                 list: list,
                 address_id: 0,
-				send_type: options.send_type || ''
+				send_type: options.send_type || '',
+				warehouse: this.sign == 'warehouse' ? true:false
             });
         },
         bookStorage(type, store_id = '') {
@@ -917,8 +922,9 @@ export default {
             this.p_pay_id = data.id;
             this.$payment.pay(data.id).then(res => {
                 if (this.showPayResult) {
+					const jump_url = this.previewData.is_send == 2 ? encodeURIComponent('/pages/cart/goods-express'):encodeURIComponent(this.orderPageUrl);
                     uni.redirectTo({
-                        url: `/pages/order-submit/pay-result?payment_order_union_id=${data.id}&order_page_url=${encodeURIComponent(this.orderPageUrl)}`,
+                        url: `/pages/order-submit/pay-result?payment_order_union_id=${data.id}&order_page_url=${jump_url}&is_send=${this.previewData.is_send}`,
                     });
                 } else {
 

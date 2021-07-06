@@ -3,7 +3,7 @@
         <template v-if="result">
             <view class="pay-result mb-24" :class="{'over-page' : community}">
                 <image class="top-pic mb-24" :src="appImg.mall.order_pay_success"></image>
-                <view class="mb-24" style="font-weight: bold;">订单提交成功</view>
+                <view class="mb-24" style="font-weight: bold;">{{is_send == 2 ? '商品购买成功后并不会给您发货,而是由我们提供冻库代为存储,如果需要发货,请到’我的仓库中’进行提货':'订单提交成功'}}</view>
                 <view class="pay-price mb-24">￥{{result.total_pay_price}}</view>
                 <view class="dir-left-nowrap main-center">
                     <view v-if="!community" class="btn-wrap">
@@ -14,7 +14,7 @@
                     </view>
                     <view class="btn-wrap">
                         <view class="return-btn" :style="{'color': getTheme.color}" @click="redirectTo(orderPageUrl)">
-                            {{community?'查看详情':'查看订单'}}
+                            {{community?'查看详情':(is_send == 2 ? '我的仓库':'查看订单')}}
                         </view>
                     </view>
                 </view>
@@ -150,7 +150,8 @@
                 recommendGoodsList: null,
                 shareCheck: false,
                 orderPageUrl: false,
-                community: false
+                community: false,
+				is_send:0
             };
         },
         computed: {
@@ -174,6 +175,7 @@
         onLoad(options) { this.$commonLoad.onload(options);
             this.payment_order_union_id = options.payment_order_union_id;
             this.orderPageUrl = decodeURIComponent(options.order_page_url || '/pages/order/index/index?status=0');
+			this.is_send = options.is_send;
             if(options.order_page_url === '/plugins/community/order/order') {
                 this.orderPageUrl = this.orderPageUrl + '?is_user=1'
                 this.community = true;

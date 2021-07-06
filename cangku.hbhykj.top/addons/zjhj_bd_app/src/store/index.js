@@ -18,6 +18,7 @@ import iPhoneX from './modules/iphoneX.js';
 import gift from './modules/gift.js';
 import cart from './modules/cart.js';
 import share from './modules/share.js';
+import warehouse from './modules/warehouse.js';
 
 const store = new Vuex.Store({
     modules: {
@@ -35,7 +36,8 @@ const store = new Vuex.Store({
         iPhoneX,
         gift,
         cart,
-        share
+        share,
+		warehouse
     }
 });
 

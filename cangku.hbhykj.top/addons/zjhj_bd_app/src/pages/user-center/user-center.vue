@@ -16,7 +16,6 @@
                     <view>{{item.name}}</view>
                 </view>
             </view>
-            <view class="u-line"></view>
         </view>
 
         <view style="padding: 0 24rpx">
@@ -334,7 +333,9 @@
                 let url = '';
                 if (name === '我的收藏') {
                     url = `/pages/favorite/favorite`;
-                } else {
+                } else if(name === '我的仓库') {
+					url = `/pages/cart/goods-express`;
+				} else {
                     url = `/pages/foot/index/index`;
                 }
                 uni.navigateTo({
@@ -354,7 +355,9 @@
             showNum(name, userInfo) {
                 if (name === '我的收藏') {
                     return userInfo && userInfo.favorite ? userInfo.favorite : 0;
-                } else {
+                } else if (name === '我的仓库') {
+					return userInfo && userInfo.cankuCount ? userInfo.cankuCount : 0;
+				} else {
                     return userInfo && userInfo.footprint ? userInfo.footprint : 0;
                 }
             }
@@ -436,7 +439,7 @@
     font-size: #{26rpx};
     color: #666666;
     padding-top: #{14rpx};
-    width: 50%;
+    width: 33%;
 }
 .u-foot-info {
     text-align: center;

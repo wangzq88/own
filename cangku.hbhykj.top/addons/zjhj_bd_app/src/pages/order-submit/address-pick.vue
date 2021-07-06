@@ -111,6 +111,8 @@
                 search: true,
                 getFocus: false,
                 type: 0,
+				order_id:0,
+				form_data:{}
             };
         },
         computed: {
@@ -129,6 +131,9 @@
         onLoad(options) { this.$commonLoad.onload(options);
             this.type = options.hasCity === `true` ? 1 : 0;
             this.sign = options.sign;
+			//我的仓库发货要用到 @date:2021-05-24
+			this.order_id = options.id !== undefined ? options.id:0;
+			this.form_data = options.form_data !== undefined ? JSON.parse(options.form_data):{};
         },
         onShow() {
             this.page = 1;
@@ -198,7 +203,10 @@
                     formData = data;
 
                     this.$store.commit('gift/addressId', formData);
-                } else {
+					uni.navigateBack();
+                } else if (this.sign === 'warehouse') {
+					this.$store.dispatch('warehouse/setAddress', {form_data:{...this.form_data,address_id:data,warehouse:true}});
+				} else {
                     const formData = this.$store.state.orderSubmit.formData;
                     if (this.type === 1) {
                         formData.list[0].address_id = data;
@@ -206,8 +214,8 @@
                         formData.address_id = data;
                     }
                     this.$store.commit('orderSubmit/mutSetFormData', formData);
+					uni.navigateBack();
                 }
-                uni.navigateBack();
             },
             editAddress(id) {
                 uni.navigateTo({

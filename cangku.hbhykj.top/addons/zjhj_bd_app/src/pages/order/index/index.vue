@@ -149,7 +149,7 @@ import { mapGetters } from 'vuex';
 export default {
     data() {
         return {
-            list: [{ name: '全部', id: 0 }, { name: '待付款', id: 1 }, { name: '待发货', id: 2 }, { name: '待收货', id: 3 }, { name: '已完成', id: 4 }],
+            list: [{ name: '全部', id: 0 }, { name: '待付款', id: 1 }, { name: '已付款', id: 10 },{ name: '待发货', id: 2 }, { name: '待收货', id: 3 }, { name: '已完成', id: 4 }],
             page: 1,
             currentIndex: 0,
             orders: [],
@@ -397,6 +397,10 @@ export default {
         },
         isShowExpressButton: function(order) {
             if (order.is_send) {
+				if (order.is_send == 2) {
+					return false;
+				}
+				
                 if (order.detailExpress.length == 1 && order.detailExpress[0].send_type == 2 && order.send_type == 0) {
                     return false;
                 }

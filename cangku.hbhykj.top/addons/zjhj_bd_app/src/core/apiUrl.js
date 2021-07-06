@@ -102,7 +102,8 @@ const apiUrl = {
         cancel_cause_list: 'api/order/cancel-cause-list',
         cancel_refund: 'api/order/cancel-refund',
         cancel_apply: 'api/order/cancel-apply',
-        city_map: 'api/order/city-map'
+        city_map: 'api/order/city-map',
+		set_address: 'api/order/set-address',
     },
     video: {
         index: 'api/video/index'
@@ -730,6 +731,9 @@ const apiUrl = {
         code: 'plugin/teller/api/member/pay-code',
         search: 'plugin/teller/api/member/search-pay-code',
     },
+	warehouse_goods: {
+		list: `api/warehouse-goods/list`
+	},
     // #ifdef H5
     registered: {
         captcha: `site/pic-captcha`,

@@ -27,6 +27,7 @@
                         </view>
                     </app-jump-button>
                 </template>
+				<template v-if='orderDetail.is_send != 2'>
                 <view v-if="orderDetail.sign !== 'vip_card'" class="order-label">配送信息</view>
                 <view v-if="orderDetail.sign !== 'vip_card'" class='order-list dir-top-nowrap'>
                     <view v-if="orderDetail.send_type != 3" class='dir-left-nowrap'>
@@ -86,7 +87,7 @@
                         </view>
                     </block>
                 </view>
-
+				</template>
                 <!-- 电子卡密 -->
                 <template v-if="orderDetail.type_data && orderDetail.type_data.ecard && orderDetail.type_data.ecard.length > 0">
                     <view style="margin:24rpx 0;">
