@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>快讯</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://cdn.staticfile.org/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+  .container{padding:0 8px;}
+  </style>
+</head>
+<body>
+<nav class="navbar navbar-default" role="navigation">
+    <div class="container-fluid"> 
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse"
+                data-target="#menu-navbar-collapse">
+            <span class="sr-only">切换导航</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="/index.php"><span class="glyphicon glyphicon-home"></span>&nbsp;首页</a>
+    </div>
+    <div class="collapse navbar-collapse" id="menu-navbar-collapse">
+        <ul class="nav navbar-nav navbar-right">
+            <li><a href="{:url('news/Tags/index')}"><span class="glyphicon glyphicon-tags"></span>&nbsp;&nbsp;标签云</a></li>
+			{if !$Request.session.user_id}
+            <li><a href="{:url('news/User/login')->domain(substr($Request.host,0,stripos($Request.host,':')))->https(true)}"><span class="glyphicon glyphicon-log-in"></span>&nbsp;&nbsp;登录</a></li> 
+            {else}
+            <li><a href="{:url('news/Tags/edit')}"><span class="glyphicon glyphicon-pencil"></span>&nbsp;&nbsp;添加标签</a></li>    
+            <li><a href="{:url('news/Index/create')}"><span class="glyphicon glyphicon-plus"></span>&nbsp;&nbsp;添加资讯</a></li>             
+			{/if}
+        </ul>
+    </div>
+    </div>
+</nav>

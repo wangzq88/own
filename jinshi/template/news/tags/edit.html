@@ -1,0 +1,46 @@
+{include file="header" /}
+<div class="container">
+{include file="breadcrumb" /}
+  <form method="post" id="create-form" action="{$action}">
+    <div class="form-group">
+      <label for="category">分类:</label>
+      <input type="text" class="form-control" id="category" name="category" value="{$row.category|default=''}" required>
+    </div>
+    <div class="form-group">
+      <label for="tag">标签:</label>
+      <textarea class="form-control" rows="5" id="tag" name="tag" required>{present name="row.tag"}{foreach $row.tag as $key=>$tag}{$tag} {/foreach}{/present}</textarea>
+    </div>   
+	{:token_field()}  
+	{present name="row._id"}
+		<input type="hidden" name="_id" value="{$row._id}" />
+	{/present}	
+    <button type="submit" class="btn btn-primary btn-block">提交</button>
+  </form>
+</div>
+{include file="footer" /}
+<script>
+$(document).ready(function(){
+    $("#create-form").submit(function(e){
+        $.ajax({
+            url:$('#create-form').attr('action'),
+            data:$('#create-form').serialize(),
+            method: "POST",
+            success:function(result){
+                if(result.code == 0)
+                {
+                    show_succ_tip(result.info,'.breadcrumb');
+                    location.href = "{:url('news/Tags/index')}";
+                }
+                else
+                {
+					$('[name=__token__]').first().val(result.token);
+                    show_err_tip(result.info,'.breadcrumb');
+                }
+            }
+        });   
+        return false;    
+    });
+});
+</script>
+</body>
+</html>

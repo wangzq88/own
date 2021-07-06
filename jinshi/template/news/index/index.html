@@ -1,0 +1,78 @@
+{include file="header" /}
+<div class="container">
+{include file="breadcrumb" /}
+  <form role="form" class="form-horizontal" action="{:url('news/Index/search')}" id="search-form" method="get">  
+    <div class="form-group">
+      <div class="col-lg-12">  
+        <input type="date" class="form-control" value="{$Request.get.start}" name="start" id="start" placeholder="开始日期">
+      </div>
+    </div>  
+    <div class="form-group">
+        <div class="col-lg-12">
+            <input type="date" class="form-control" value="{$Request.get.end}" name="end" id="end" placeholder="结束日期">
+        </div>    
+    </div>     
+    <div class="form-group">
+        <div class="col-lg-12">
+            <div class="input-group">
+                <input type="search" id="keyword" name="keyword" value="{$Request.get.keyword}" class="form-control">
+                <span class="input-group-btn">
+                    <button class="btn btn-default" type="submit">搜索</button>
+                </span>
+            </div><!-- /input-group -->
+        </div><!-- /.col-lg-6 -->    
+    </div> 
+  </form>
+  <ul class="list-group">
+{volist name="list" id="item" }  
+    {if condition="$item.type == 1"}
+    <li class="list-group-item"><article class="list-group-item-text"><a href="{$item.url}" target="_blank"><time>{$item.date}</time></a>{if $Request.session.user_name == 'admin'}<div class="dropdown pull-right"><a href="#" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span></a><ul class="dropdown-menu"><li><a href="javascript:void(0);" myid="{$item._id}" class="delete-link"><span class="glyphicon glyphicon-remove"></span> 删除</a></li></ul></div>{/if}<p></p><p>{$item.content|raw}</p>{notempty name="item.img"}<p><a href="{$item.img}" target="_blank">{$item.img}</a></p>{/notempty}</article></li>
+    {elseif condition="$item.type == 3"/}
+    <li class="list-group-item"><article class="list-group-item-text"><a href="{$item.url}" target="_blank"><time>{$item.date}</time></a>{if $Request.session.user_name == 'admin'}<div class="dropdown pull-right"><a href="#" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span></a><ul class="dropdown-menu"><li><a href="{:url('news/Index/edit',['_id'=>(string)$item._id])}" class="edit-link"><span class="glyphicon glyphicon-pencil"></span> 编辑</a></li><li class="divider"></li><li><a href="javascript:void(0);" myid="{$item._id}" class="delete-link"><span class="glyphicon glyphicon-remove"></span> 删除</a></li></ul></div>{/if}<p></p><p>【{$item.title}】{$item.content|raw}</p></article></li>
+    {else}
+    <li class="list-group-item"><section class="list-group-item-text"><a href="{$item.url}" target="_blank"><time>{$item.date}</time></a><p></p><p>{$item.title}</p>
+    {present name="item.num_json"}<p>{foreach $item.num_json as $nj} <span>{$nj}</span> {/foreach}</p>{/present}
+    <p>{$item.data_tag}</p></section></li>
+    {/if}
+{/volist}
+  </ul>
+  {$list->render()|raw}
+</div>
+{include file="footer" /}
+<script>
+$(document).ready(function(){
+    {if condition="$Request.get.keyword"}
+        $.each($('.list-group-item'),function(i,n){
+            var content = $(n).html();
+            var values = content.split('{$Request.get.keyword}');
+            $(n).html(values.join('<mark>{$Request.get.keyword}</mark>'));
+        });
+    {/if}
+	$('.delete-link').click(function(){
+		var id = $(this).attr('myid');
+		var self = $(this);
+		var r=confirm("确定要删除吗");
+		if (r==true)
+		{
+			$.ajax({
+				url:"{:url('news/Index/delete')}",
+				type:'POST',
+				dataType:"json",
+				data:{_id:id},
+				success:function(result,status,xhr){
+					if(result.code == 0)
+					{
+						self.parents(".list-group-item").remove();
+					}
+					else
+					{
+						alert(result.info);
+					}
+				}
+			});
+		}	
+	});
+});
+</script>
+</body>
+</html>

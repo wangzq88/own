@@ -1,0 +1,56 @@
+{include file="header" /}
+<div class="container">
+{include file="breadcrumb" /}
+<div class="panel panel-default">
+{volist name="list" id="item" } 
+	<div class="panel-heading">
+		{$item.category}
+		{if $Request.session.user_name == 'admin'}
+			<div class="dropdown pull-right"><a href="#" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span></a>
+				<ul class="dropdown-menu">
+					<li><a href="{:url('news/Tags/edit',['_id'=>(string)$item._id])}" class="edit-link"><span class="glyphicon glyphicon-pencil"></span> 编辑</a></li>
+					<li class="divider"></li>
+                    <li><a href="javascript:void(0);" myid="{$item._id}" class="delete-link"><span class="glyphicon glyphicon-remove"></span> 删除</a></li>
+				</ul>
+			</div>
+		{/if}
+	</div>
+	<div class="panel-body lead" style="line-height:2;">
+		{volist name="item.tag" id="tag" } 
+			<a href="{:url('news/Index/search',['keyword' => $tag])}" target="_blank"><span class="label label-default">{$tag}</span></a>
+		{/volist}	
+	</div>
+{/volist}	
+</div>  
+</div>
+{include file="footer" /}
+<script>
+$(document).ready(function(){
+	$('.delete-link').click(function(){
+		var id = $(this).attr('myid');
+		var self = $(this);
+		var r=confirm("确定要删除吗");
+		if (r==true)
+		{
+			$.ajax({
+				url:"{:url('news/Tags/delete')}",
+				type:'POST',
+				dataType:"json",
+				data:{_id:id},
+				success:function(result,status,xhr){
+					if(result.code == 0)
+					{
+						location.href = '/index.php';
+					}
+					else
+					{
+						alert(result.info);
+					}
+				}
+			});
+		}	
+	});  
+});
+</script>
+</body>
+</html>
