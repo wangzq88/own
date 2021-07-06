@@ -472,7 +472,7 @@ Yii::$app->loadViewComponent('order/app-select-print');
                                 <el-tag size="small" v-if="item.send_type == 2">同城配送</el-tag>
                                 <el-tag size="small" v-if="item.send_type == 3">自动发货</el-tag>
                                 <el-tag size="small" type="warning" v-if="item.is_pay == 0">未付款</el-tag>
-                                <el-tag size="small" type="warning" v-if="item.is_pay == 1 && item.is_send == 0">已付款
+                                <el-tag size="small" type="warning" v-if="item.is_pay == 1 && (item.is_send == 0 || item.is_send == 2)">已付款
                                 </el-tag>
                                 <el-tag size="small" type="success"
                                         v-if="item.is_send == 0 && item.is_pay == 1 && item.detailExpress && item.detailExpress.length > 0">
@@ -491,6 +491,10 @@ Yii::$app->loadViewComponent('order/app-select-print');
                                 <el-tag size="small" type="success" v-if="item.is_sale == 1">已完成</el-tag>
                                 <el-tag size="small" type="danger" v-if="item.cancel_status == 1">已取消</el-tag>
                                 <el-tag size="small" type="danger" v-else-if="item.cancel_status == 2">申请取消</el-tag>
+                                <el-tag size="small" type="success"
+                                        v-if="item.is_send == 2 && item.is_pay == 1">
+                                    用户仓库
+                                </el-tag>        
                             </template>
                             <slot name="orderTag" :order="item"></slot>
                         </div>
@@ -717,19 +721,19 @@ Yii::$app->loadViewComponent('order/app-select-print');
                                     <!-- 发货 -->
                                     <el-tooltip class="item" effect="dark" content="发货" placement="top">
                                         <img class="app-order-icon" @click="openExpress(item,'send')"
-                                             v-if="item.action_status.is_express_send && isShowSend"
+                                             v-if="item.action_status.is_express_send && isShowSend && item.is_send != 2"
                                              src="statics/img/mall/order/send.png" alt="">
                                     </el-tooltip>
                                     <!-- 同城配送发货 选择配送员 -->
                                     <el-tooltip class="item" effect="dark" content="发货" placement="top">
                                         <img class="app-order-icon" @click="openExpress(item,'send')"
-                                             v-if="item.action_status.is_city_send && isShowSend"
+                                             v-if="item.action_status.is_city_send && isShowSend && item.is_send != 2"
                                              src="statics/img/mall/order/send.png" alt="">
                                     </el-tooltip>
                                     <!-- 到店自提也可发货 -->
                                     <el-tooltip class="item" effect="dark" content="发货" placement="top">
                                         <img class="app-order-icon" @click="storeOrderSend(item)"
-                                             v-if="item.send_type == 1 && (item.is_pay == 1 || item.pay_type == 2) && item.is_send == 0 && item.cancel_status != 1 && item.is_send_show == 1 && isShowSend && item.is_recycle == 0 && item.status != 0"
+                                             v-if="item.send_type == 1  && item.is_send != 2 && (item.is_pay == 1 || item.pay_type == 2) && item.is_send == 0 && item.cancel_status != 1 && item.is_send_show == 1 && isShowSend && item.is_recycle == 0 && item.status != 0"
                                              src="statics/img/mall/order/send.png" alt="">
                                     </el-tooltip>
                                 </template>
@@ -742,7 +746,7 @@ Yii::$app->loadViewComponent('order/app-select-print');
                                 </el-tooltip>
                                 <!-- 打印发货单 -->
                                 <el-tooltip class="item"
-                                            v-if="item.action_status && item.action_status.is_print_send_template == 1"
+                                            v-if="item.action_status && item.action_status.is_print_send_template == 1 && item.is_send != 2"
                                             effect="dark" content="打印发货单" placement="top">
                                     <img class="app-order-icon"
                                          src="statics/img/mall/order/invoice.png"
@@ -1186,6 +1190,7 @@ Yii::$app->loadViewComponent('order/app-select-print');
                         {value: '4', name: '待处理'},
                         {value: '5', name: '已取消'},
                         {value: '7', name: '回收站'},
+                        {value: '10', name: '用户仓库'},
                     ]
                 }
             },

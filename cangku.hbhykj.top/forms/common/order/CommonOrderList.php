@@ -97,12 +97,12 @@ class CommonOrderList extends Model
             return $this->getErrorResponse();
         }
 
-        $this->query = $query = Order::find()->alias('o')->where([
+        $this->query = Order::find()->alias('o')->where([
             'o.mall_id' => \Yii::$app->mall->id,
             'o.is_delete' => 0,
         ]);
         foreach ($this->attributes as $key => $value) {
-            $method = $this->getMethod($key);
+            $method = $this->getMethod($key);	
             if ($method && method_exists($this, $method) && $value !== null && $value !== false) {
                 $this->$method();
             }
@@ -120,8 +120,7 @@ class CommonOrderList extends Model
     {
         try {
             $this->getQuery();
-            $list = $this->query->asArray($this->is_array)->groupBy('o.id')->all();
-
+            $list = $this->query->asArray($this->is_array)->groupBy('o.id')->all();		
             foreach ($list as &$item) {
                 if ($item['order_form']) {
                     $item['order_form'] = \Yii::$app->serializer->decode($item['order_form']);
@@ -187,6 +186,7 @@ class CommonOrderList extends Model
                 break;
             // 待发货
             case 2:
+                $subQuery = (new  \yii\db\Query())->select('order_id')->from('{{%warehouse_goods}}')->filterWhere(['flag' => 0,'user_id' => $this->user_id]);
                 $this->query->andWhere(['o.is_send' => 0])->andWhere([
                     'or',
                     ['o.pay_type' => 2],
@@ -198,7 +198,10 @@ class CommonOrderList extends Model
                         ['o.sign' => 'gift',],
                         ['!=', 'o.auto_cancel_time', ''],
                     ], ['not in', 'o.sign', ['gift']],
+                ])->orWhere([
+                    'o.id' => $subQuery
                 ]);
+
                 break;
             // 待收货
             case 3:
@@ -229,6 +232,16 @@ class CommonOrderList extends Model
                     ->andWhere(['!=', 'o.sign', 'vip_card'])
                     ->andWhere(['!=', 'o.is_comment', 1]);
                 break;
+			case 10:
+				//未发货，没填收货地址，存在我的仓库
+                $this->query->andWhere([
+					'AND',
+					['o.is_recycle' => 0, 'o.is_send' => 2],
+                    ['or', ['o.is_pay' => 1], ['o.pay_type' => 2]],
+					['o.cancel_status' => 0],
+					['o.sale_status' => 0],
+					['o.status' => 1],
+				]);			
             default:
                 break;
         }

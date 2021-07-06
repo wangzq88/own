@@ -7,6 +7,7 @@ use app\models\Model;
 use app\models\Order;
 use app\models\OrderDetailExpress;
 use app\models\OrderDetailExpressRelation;
+use app\models\WarehouseGoods;
 
 abstract class BaseSend extends Model
 {
@@ -15,13 +16,14 @@ abstract class BaseSend extends Model
     public $mch_id;
     public $order_detail_id; // 订单物流分开发送
     public $is_trigger_event = true;
+    public $warehouse_goods_id;
 
     public function rules()
     {
         return [
             [['order_id'], 'required'],
             [['order_id', 'mch_id', 'express_id'], 'integer'],
-            [['order_detail_id'], 'safe'],
+            [['order_detail_id','warehouse_goods_id'], 'safe'],
         ];
     }
 
@@ -30,6 +32,7 @@ abstract class BaseSend extends Model
         return [
             'order_id' => '订单ID',
             'order_detail_id' => '发货商品',
+            'warehouse_goods_id' => '我的仓库ID',
         ];
     }
 
@@ -96,7 +99,14 @@ abstract class BaseSend extends Model
                 $this->order_detail_id = [];
             }
         }
-
+        // 兼容小程序端数据、小程序端不能传数组
+        if (is_string($this->warehouse_goods_id)) {
+            try {
+                $this->warehouse_goods_id = json_decode($this->warehouse_goods_id);
+            } catch (\Exception $exception) {
+                $this->warehouse_goods_id = [];
+            }
+        }
         // 兼容小程序端多商户发货
         if ($this->mch_id > 0 && !$this->order_detail_id) {
             $orderDetailId =[];
@@ -105,7 +115,6 @@ abstract class BaseSend extends Model
             }
             $this->order_detail_id = $orderDetailId;
         }
-
         if (!is_array($this->order_detail_id)) {
             throw new \Exception('order_detail_id参数必须为数组');
         }
@@ -118,16 +127,26 @@ abstract class BaseSend extends Model
             if ($order->is_send == 1) {
                 throw new \Exception('express_id参数异常');
             }
-
+            /* @date:2021-05-22 注释
             $relation = $order->detailExpressRelation;
             if (count($relation) >= count($order->detail)) {
                 throw new \Exception('订单物流数据异常');
             }
-
+            */
             // 同个商品不可重复发货
-            $count = OrderDetailExpressRelation::find()->andWhere(['mall_id' => \Yii::$app->mall->id, 'is_delete' => 0, 'order_detail_id' => $this->order_detail_id])->count();
-            if ($count) {
-                throw new \Exception('同一个商品不可重复发货');
+            $command = (new \yii\db\Query())->select(['order_detail_id','sum(`number`) AS all_number'])->from('{{%order_detail_express_relation}}')->where(['mall_id' => \Yii::$app->mall->id, 'is_delete' => 0, 'order_detail_id' => $this->order_detail_id])->groupBy('order_detail_id')->createCommand();
+            $rows = $command->queryAll();
+            if ($rows) {
+                foreach ($rows as $row) {
+                    foreach ($order->detail as $item) {
+                        if ($item->id == $row['order_detail_id']) {
+                            if($row['all_number'] == 0 || $row['all_number'] >= $item->num) {
+                                throw new \Exception('商品已经全部发货');
+                            }
+                        }
+                    }
+                }
+
             }
         }
     }
@@ -159,21 +178,32 @@ abstract class BaseSend extends Model
         if (!$res) {
             throw new \Exception($this->getErrorMsg($orderDetailExpress));
         }
-
-        $number = 0;
+        //$number = 0;
         if (!$this->express_id) {
-            foreach ($this->order_detail_id as $detailId) {
+            foreach ($this->order_detail_id as $key => $detailId) {
                 $model = new OrderDetailExpressRelation();
                 $model->mall_id = \Yii::$app->mall->id;
                 $model->mch_id = \Yii::$app->user->identity->mch_id;
                 $model->order_id = $this->order_id;
                 $model->order_detail_id = $detailId;
                 $model->order_detail_express_id = $orderDetailExpress->id;
+                if(isset($this->warehouse_goods_id[$key]))
+                {
+                    $row = WarehouseGoods::find()->where([
+                        'id' => $this->warehouse_goods_id[$key],
+                    ])->one();
+                    $row->flag = 1;
+                    $res = $row->save();
+                    if (!$res) {
+                        throw new \Exception($this->getErrorMsg($row));
+                    }                    
+                    $model->number = $row->num;
+                }              
                 $res = $model->save();
                 if (!$res) {
                     throw new \Exception($this->getErrorMsg($model));
                 }
-                $number++;
+                //$number++;
             }
         }
 
@@ -185,8 +215,40 @@ abstract class BaseSend extends Model
                 throw new \Exception($this->getErrorMsg($order));
             }
         }
-
+        // @date:2021-05-22
+        if (in_array($order->is_send,[0,2])) {
+            //保存表 order_detail_express_relation 记录
+            $relationCountList = [];            
+            $flag = 1;
+            foreach ($order->detailExpressRelation as $item) {
+                if(isset($relationCountList[$item->order_detail_id])) {
+                    $relationCountList[$item->order_detail_id] += $item->number;
+                } else {
+                    $relationCountList[$item->order_detail_id] = $item->number;
+                }
+            }
+            foreach($order->detail as $item) {
+                //历史数据，商品本来没有邮寄数量的功能，本来值为 0 ，修改成全部数量，@date:2021-05-22
+                if($relationCountList[$item->id] == 0) {
+                    $relationCountList[$item->id] = $item->num; 
+                }                
+                if($item->num != $relationCountList[$item->id]) {
+                    $flag = 0;
+                    break;
+                }
+            }   
+            // 所有商品已发货，发货状态更新
+            if($flag) {
+                $order->is_send = 1;
+                $order->send_time = mysql_timestamp();
+                $res = $order->save();
+                if (!$res) {
+                    throw new \Exception($this->getErrorMsg($order));
+                }                
+            }         
+        }
         // 所有商品已发货，发货状态更新
+        /*
         $relationCount = count($order->detailExpressRelation) + $number;
         if (count($order->detail) == $relationCount && $order->is_send == 0) {
             $order->is_send = 1;
@@ -195,7 +257,7 @@ abstract class BaseSend extends Model
             if (!$res) {
                 throw new \Exception($this->getErrorMsg($order));
             }
-        }
+        }*/
 
         return $order;
     }

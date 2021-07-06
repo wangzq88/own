@@ -214,6 +214,7 @@ Yii::$app->loadViewComponent('app-platform');
                         {value: '4', name: '待处理'},
                         {value: '5', name: '已取消'},
                         {value: '7', name: '回收站'},
+                        {value: '10', name: '用户仓库'},
                     ]
                 }
             },

@@ -52,6 +52,7 @@ class OrderSubmitJob extends BaseJob implements JobInterface
     public $status;
     public $appVersion;
     public $platform;
+    public $enableWarehouse;
 
     /** @var string $OrderSubmitFormClass */
     public $OrderSubmitFormClass;
@@ -86,7 +87,8 @@ class OrderSubmitJob extends BaseJob implements JobInterface
                 ->setEnablePriceEnable($this->enablePriceEnable)
                 ->setEnableVipPrice($this->enableVipPrice)
                 ->setEnableAddressEnable($this->enableAddressEnable)
-                ->setEnableOrderForm($this->enableOrderForm);
+                ->setEnableOrderForm($this->enableOrderForm)
+                ->setEnableWarehouse($this->enableWarehouse);
             $form->setPluginData();
             $data = $form->getAllData();
             if (!$data['address_enable']) {
@@ -143,7 +145,7 @@ class OrderSubmitJob extends BaseJob implements JobInterface
 
                 $order->is_pay = 0;
                 $order->pay_type = 0;
-                $order->is_send = 0;
+                $order->is_send = $data['is_send'];
                 $order->is_confirm = 0;
                 $order->is_sale = 0;
                 $order->support_pay_types = $order->encodeSupportPayTypes($this->supportPayTypes);
@@ -167,7 +169,7 @@ class OrderSubmitJob extends BaseJob implements JobInterface
                     $order->send_type = 0;
                     $order->store_id = 0;
                 }
-
+                $this->sign = $this->enableWarehouse ? 'warehouse':$this->sign;
                 $order->sign = $this->sign !== null ? $this->sign : '';
                 $order->token = $this->token;
                 $order->status = $this->status;
@@ -187,7 +189,9 @@ class OrderSubmitJob extends BaseJob implements JobInterface
 
                 $orderDetails = [];
                 foreach ($mchItem['goods_list'] as $goodsItem) {
-                    $form->subGoodsNum($goodsItem['goods_attr'], $goodsItem['num'], $goodsItem);
+                    if (!$this->enableWarehouse) {
+                        $form->subGoodsNum($goodsItem['goods_attr'], $goodsItem['num'], $goodsItem);
+                    }
                     $orderDetails[] = $form->extraGoodsDetail($order, $goodsItem);
                 }
 
@@ -259,6 +263,8 @@ class OrderSubmitJob extends BaseJob implements JobInterface
                     'vip_discount' => $mchItem['vip_discount'] ?? null,
                     'flash_sale_discount' => $mchItem['flash_sale_discount'] ?? null,
                     'wholesale_discount' => $mchItem['wholesale_discount'] ?? null,
+                    'orderDetails' => $orderDetails,
+                    'enableWarehouse' => $this->enableWarehouse
                 ];
                 \Yii::$app->trigger(Order::EVENT_CREATED, $event);
             }

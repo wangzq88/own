@@ -72,7 +72,7 @@ class OrderPayedHandlerClass extends BaseOrderPayedHandler
     {
         \Yii::error('--mall pay--');
         // 首次付款绑定下级--生成分销订单--下单用户成为分销商--设置卡密数据
-        $this->saveResult()->becomeJuniorByFirstPay()->addShareOrder()->becomeShare()->setTypeData();
+        $this->saveResult()->becomeJuniorByFirstPay()->addShareOrder()->becomeShare()->setHouseGoods()->popHouseGoods()->setTypeData();
         return $this;
     }
 }

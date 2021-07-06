@@ -73,6 +73,10 @@ class OrderPayNotify extends PaymentNotify
         $event = new OrderEvent();
         $event->order = $order;
         $event->sender = $this;
+        $event->pluginData = [
+            'orderDetails' => $order->detail,
+            'enableWarehouse' => $order->sign == 'warehouse'
+        ];
         \Yii::$app->trigger(Order::EVENT_PAYED, $event);
         return true;
     }

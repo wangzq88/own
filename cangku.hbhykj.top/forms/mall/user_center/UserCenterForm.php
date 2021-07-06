@@ -81,12 +81,20 @@ class UserCenterForm extends Model
                     'icon_url' => $iconUrlPrefix . 'icon-order-4.png',
                     'name' => '售后',
                 ],
+                [
+                    'icon_url' => $iconUrlPrefix . 'icon-balance.png',
+                    'name' => '已付款',
+                ],
             ],
             'foot_bar' => [
                 [
                     'icon_url' => $iconUrlPrefix . 'favorite.png',
                     'name' => '我的收藏',
                 ],
+                [
+                    'icon_url' => $iconUrlPrefix . 'icon-order-2.png',
+                    'name' => '我的仓库',
+                ],				
                 [
                     'icon_url' => $iconUrlPrefix . 'foot.png',
                     'name' => '我的足迹',

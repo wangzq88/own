@@ -11,6 +11,7 @@
 namespace app\handlers\orderHandler;
 
 
+use app\models\WarehouseOrderGoods;
 use Overtrue\EasySms\Exceptions\NoGatewayAvailableException;
 use app\core\mail\SendMail;
 use app\core\sms\Sms;
@@ -400,6 +401,58 @@ abstract class BaseOrderPayedHandler extends BaseOrderHandler
         } catch (\Exception $exception) {
             \Yii::error('向用户发送短信消息失败');
             \Yii::error($exception);
+        }
+        return $this;
+    }
+    protected function setHouseGoods()
+    {
+        try {
+            if($this->event->order->is_send == 2)
+            {
+                foreach ($this->event->pluginData['orderDetails'] as $detail)
+                {
+                    $whogs = new WarehouseOrderGoods();
+                    $whogs->goods_id = $detail->goods_id;
+                    $whogs->detail_id = $detail->id;
+                    $whogs->num = $detail->num;
+                    $whogs->order_id = $this->event->order->id;
+                    $whogs->user_id = $this->event->order->user_id;
+                    $whogs->created_at = mysql_timestamp();
+                    $whogs->updated_at = mysql_timestamp();
+                    $whogs->save();
+                }
+            }
+
+        } catch (\Exception $exception) {
+            \Yii::error('仓库订单商品存储异常：' . $exception->getMessage());
+        }
+        return $this;
+    }
+    /**
+     * @return $this
+     *
+     */
+    protected function popHouseGoods()
+    {
+        try {
+            if($this->event->order->is_send == 0 && $this->event->order->sign == 'warehouse')
+            {
+                foreach ($this->event->pluginData['orderDetails'] as $detail)
+                {
+                    $whogs = new WarehouseOrderGoods();
+                    $whogs->goods_id = $detail->goods_id;
+                    $whogs->detail_id = $detail->id;
+                    $whogs->num = $detail->num * -1;
+                    $whogs->order_id = $this->event->order->id;
+                    $whogs->user_id = $this->event->order->user_id;
+                    $whogs->created_at = mysql_timestamp();
+                    $whogs->updated_at = mysql_timestamp();
+                    $whogs->save();
+                }
+            }
+
+        } catch (\Exception $exception) {
+            \Yii::error('仓库订单商品取货异常：' . $exception->getMessage());
         }
         return $this;
     }

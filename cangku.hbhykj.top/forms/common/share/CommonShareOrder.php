@@ -79,7 +79,7 @@ class CommonShareOrder extends Model
             ->with(['detail.share', 'detail.goodsWarehouse', 'refund', 'user.userInfo', 'store', 'user.userPlatform'])
             ->where([
                 'mall_id' => $this->mall->id, 'is_delete' => 0, 'id' => $shareOrder, 'is_recycle' => 0
-            ])->andWhere(['!=', 'cancel_status', 1])
+            ])->andWhere(['!=', 'cancel_status', 1])->andWhere(['!=', 'is_send', 2])
             ->keyword($status == 1, ['is_pay' => 0])
             ->keyword($status == 2, ['is_pay' => 1, 'is_sale' => 0])
             ->keyword($status == 3, ['is_sale' => 1])

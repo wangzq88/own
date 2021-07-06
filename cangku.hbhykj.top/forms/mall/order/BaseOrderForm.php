@@ -137,6 +137,7 @@ abstract class BaseOrderForm extends Model
             ->with('store', 'expressSingle', 'orderClerk')
             ->with('detailExpress.expressRelation.orderDetail.expressRelation')
             ->with('detailExpress.expressSingle')
+            ->with('warehouseGoods')
             ->asArray()
             ->all();
 
@@ -154,6 +155,7 @@ abstract class BaseOrderForm extends Model
 
         $order = new Order();
         foreach ($list as &$item) {
+            $item['address'] = trim($item['address']);
             $item['platform_icon'] = $userPlatformList[$item['user_id']]['platform_icon'];
             //插件名称
             if ($item['sign'] == '' && $item['mch_id'] == 0) {
@@ -432,7 +434,6 @@ abstract class BaseOrderForm extends Model
                 ]
             );
         }
-
         $query->keyword($this->status == -1, ['AND', ['o.is_recycle' => 0], ['not', ['o.cancel_status' => 1]]])
             ->keyword($this->status == 0, [
                 'AND',
@@ -481,10 +482,28 @@ abstract class BaseOrderForm extends Model
             ->keyword($this->status == 9, [
                 'AND',
                 ['o.is_confirm' => 1, 'o.is_recycle' => 0, 'o.is_sale' => 0],
-            ]);
+            ])
+            //未发货，没填收货地址，存在我的仓库
+            ->keyword($this->status == 10, [
+                'AND',
+                ['o.is_recycle' => 0, 'o.is_send' => 2],
+                ['or', ['o.is_pay' => 1], ['o.pay_type' => 2]],
+                ['o.cancel_status' => 0],
+                ['o.sale_status' => 0],
+                ['o.status' => 1],
+            ])
+            ;
 
         ////////////////
-
+        //date:2021-05-26  我的仓库待发货
+        if ($this->status == 1) {
+            $subQuery = (new  \yii\db\Query())->select('order_id')->distinct()->from('{{%warehouse_goods}}')->where(['flag' => 0]);
+            $query->orWhere(['o.id' => $subQuery]);
+        }
+        if ($this->status == 2) {
+            $subQuery = (new  \yii\db\Query())->select('order_id')->distinct()->from('{{%warehouse_goods}}')->where(['flag' => 1]);
+            $query->orWhere(['o.id' => $subQuery]);
+        }
         if ($this->user_id) {
             $query->andWhere(['o.user_id' => $this->user_id]);
         }
@@ -697,7 +716,6 @@ abstract class BaseOrderForm extends Model
             $query->andWhere(['exists', (OrderDetail::find()->alias('od')
                 ->where("o.id = od.order_id")->andWhere($where))]);
         }
-
         return $query;
     }
 

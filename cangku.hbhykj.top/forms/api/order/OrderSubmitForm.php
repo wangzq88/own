@@ -109,6 +109,10 @@ class OrderSubmitForm extends Model
     private $goods_num_info = [];
 
     /**
+     * 商品是否来自我的仓库
+     */
+    private $enableWarehouse = false;   
+    /**
      * 订单状态|1.已完成|0.进行中 不能对订单进行任何操作
      * @var int
      */
@@ -178,6 +182,11 @@ class OrderSubmitForm extends Model
     public function getEnableAddressEnable()
     {
         return $this->enableAddressEnable;
+    }
+
+    public function getEnableWarehouse()
+    {
+        return $this->enableWarehouse;
     }
 
     /**
@@ -267,6 +276,11 @@ class OrderSubmitForm extends Model
         return $this;
     }
 
+    public function setEnableWarehouse($val)
+    {
+        $this->enableWarehouse = $val;
+        return $this;
+    }    
     /**
      * @return array
      * @throws \yii\db\Exception
@@ -316,14 +330,20 @@ class OrderSubmitForm extends Model
                 ]
             ];
         }
+		
         if (!$data['hasCity'] || count($data['mch_list']) >= 2) {
-            if (!$this->getAddress() && !$data['allZiti']) {
+			//可以不填收货地址，进入我的仓库 @date:2021-05-18
+            if ($this->form_data['warehouse'] && !$this->getAddress() && !$data['allZiti']) {
+
+                
                 return [
                     'code' => 1,
                     'msg' => '请先选择收货地址。',
                 ];
+                
             }
         }
+		
         if ($data['hasCity'] && !$data['mch_list'][0]['address']) {
             return [
                 'code' => 1,
@@ -345,7 +365,8 @@ class OrderSubmitForm extends Model
             }
         }
         foreach ($data['mch_list'] as $mchItem) {
-            if (isset($mchItem['city']) && isset($mchItem['city']['error'])) {
+			//添加 $data['hasCity'] 判断，有填写收货地址才需要验证  @date:2021-05-18
+            if ($this->form_data['warehouse'] && isset($mchItem['city']) && isset($mchItem['city']['error'])) {
                 return [
                     'code' => 1,
                     'msg' => $mchItem['city']['error']
@@ -359,6 +380,23 @@ class OrderSubmitForm extends Model
             }
             if (($balanceKey = array_search('huodao', (array)$this->supportPayTypes)) !== false) {
                 unset($this->supportPayTypes[$balanceKey]);
+            }
+        }
+
+        $whf = new \app\forms\api\WarehouseForm();
+        $orderDetail = $whf->whogGroup();
+        if ($this->enableWarehouse) {
+            foreach($data['mch_list'] as $mchItem) {
+                foreach ($mchItem['goods_list'] as $goodsItem) {
+                    foreach ($orderDetail as $detail) {
+                        if($goodsItem['goods_id'] == $detail['goods_id'] && $goodsItem['num'] > $detail['num']) {
+                            return [
+                                'code' => 1,
+                                'msg' => '商品数量超出仓库数量'
+                            ];
+                        }
+                    }
+                }
             }
         }
 
@@ -381,7 +419,8 @@ class OrderSubmitForm extends Model
             'OrderSubmitFormClass' => static::class,
             'status' => $this->status,
             'appVersion' => \Yii::$app->appVersion,
-            'platform' => \Yii::$app->appPlatform
+            'platform' => \Yii::$app->appPlatform,
+            'enableWarehouse' => $this->enableWarehouse
         ];
         $class = new OrderSubmitJob($dataArr);
         $queueId = \Yii::$app->queue->delay(0)->push($class);
@@ -409,12 +448,15 @@ class OrderSubmitForm extends Model
         $vipCardDiscount = 0; // 超级会员卡优惠金额
         $nextFullReduce = false;
         foreach ($listData as &$mchItem) {
-            $this->checkTime($mchItem['goods_list']);
-            $this->checkBuyAuth($mchItem['goods_list']);
-            $this->checkHasNegotiableGoods($mchItem['goods_list']);
-            $this->checkGoodsStock($mchItem['goods_list']);
-            $this->checkGoodsOrderLimit($mchItem['goods_list']);
-            $this->checkGoodsBuyLimit($mchItem['goods_list']);
+			//@author @date:2021-06-06
+			if (!$this->form_data['warehouse']) {
+				$this->checkTime($mchItem['goods_list']);
+				$this->checkBuyAuth($mchItem['goods_list']);
+				$this->checkHasNegotiableGoods($mchItem['goods_list']);
+				$this->checkGoodsStock($mchItem['goods_list']);
+				$this->checkGoodsOrderLimit($mchItem['goods_list']);
+				$this->checkGoodsBuyLimit($mchItem['goods_list']);				
+			}
             $formMchItem = $mchItem['form_data'];
 
             $mchItem['express_price'] = price_format(0);
@@ -429,7 +471,8 @@ class OrderSubmitForm extends Model
                 $totalGoodsPrice += $goodsItem['total_price'];
                 $totalGoodsOriginalPrice += $goodsItem['total_original_price'];
             }
-            $mchItem['total_goods_price'] = price_format($totalGoodsPrice);
+            //@author @date:2021-06-06
+            $mchItem['total_goods_price'] = $this->form_data['warehouse'] ? price_format(0):price_format($totalGoodsPrice);
             $mchItem['total_goods_original_price'] = price_format($totalGoodsOriginalPrice);
 
             //注意优惠冲突及先后级，一般情况是设置独立优惠，其他以下优惠关闭
@@ -577,7 +620,17 @@ class OrderSubmitForm extends Model
             $mchItem['insert_total_discount'] = $insertTotalDiscount > 0 ?
                 ('+¥' . price_format($insertTotalDiscount)) : ('-¥' . price_format(0 - $insertTotalDiscount));
         }
-
+        $is_send = 0;
+        if (!$this->form_data['warehouse'] && (!$hasCity || count($listData) >= 2) ) {
+            if (!$this->getAddress() && !$allZiti) {          
+                //可以不填收货地址，进入我的仓库 @date:2021-05-18
+                $is_send = 2;
+            }
+        }
+        if (isset($this->form_data['warehouse'])) {
+            $this->setEnableWarehouse($this->form_data['warehouse']);
+        }
+        
         return [
             'mch_list' => $listData,
             'total_price' => price_format($total_price),
@@ -593,7 +646,8 @@ class OrderSubmitForm extends Model
             'vip_card_discount_total_price' => price_format($total_price + $vipCardPrice - $vipCardDiscount), // 超级会员卡折扣后的总价格
             'hasEcard' => $hasEcard,
             'hasRecipient' => $this->hasRecipient(),
-            'next_full_reduce' => $nextFullReduce
+            'next_full_reduce' => $nextFullReduce,
+            'is_send' => $is_send
         ];
     }
 
@@ -1838,6 +1892,9 @@ class OrderSubmitForm extends Model
         if ($this->xAddress) {
             return $this->xAddress;
         }
+		if (!$this->form_data['warehouse']) {
+			return null;
+		}
         /** @var User $user */
         $user = $this->getUser();
         if (!$this->form_data['address_id']) {
@@ -1847,6 +1904,7 @@ class OrderSubmitForm extends Model
                 'is_default' => 1,
                 'type' => 0,
             ]);
+			
         } else {
             $this->xAddress = Address::findOne([
                 'user_id' => $user->id,

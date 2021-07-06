@@ -26,6 +26,7 @@ use app\forms\api\order\OrderRefundSendForm;
 use app\forms\api\order\OrderRefundSubmitForm;
 use app\forms\api\order\OrderPayResultForm;
 use app\forms\api\order\OrderSubmitForm;
+use app\forms\api\order\OrderAddressForm;
 use app\forms\api\StoreForm;
 use app\models\Express;
 
@@ -66,6 +67,8 @@ class OrderController extends ApiController
     {
         $form = new OrderSubmitForm();
         $form->form_data = \Yii::$app->serializer->decode(\Yii::$app->request->post('form_data'));
+			\Yii::warning('运行到这里0');
+			\Yii::warning($form->form_data);		
         $mallPaymentTypes = \Yii::$app->mall->getMallSettingOne('payment_type');
         return $this->asJson($form->setEnableFullReduce(true)->setSupportPayTypes($mallPaymentTypes)->submit());
     }
@@ -106,6 +109,18 @@ class OrderController extends ApiController
         $form->attributes = \Yii::$app->request->get();
 
         return $this->asJson($form->getDetail());
+    }
+
+    /**
+     * 在我的仓库中设置收货地址
+     * @return \yii\web\Response
+     */
+    public function actionSetAddress()
+    {
+        $form = new OrderAddressForm();
+        $form->attributes = \Yii::$app->request->post();
+
+        return $this->asJson($form->setAddress());
     }
 
     /**

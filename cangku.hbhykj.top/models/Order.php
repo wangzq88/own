@@ -76,6 +76,7 @@ use Yii;
  * @property string $platform wxapp:微信小程序 aliapp:支付宝小程序 bdapp:百度小程序 ttapp:字节跳动小程序 wechat:公众号网页 mobile:H5
  * @property OrderRefund[] $refund
  * @property OrderDetail[] $detail
+ * @property WarehouseGoods[] $warehouseGoods
  * @property ShareOrder $shareOrder
  * @property UserCard[] $userCards
  * @property User $user
@@ -227,6 +228,11 @@ class Order extends ModelActiveRecord
         return $this->hasMany(OrderDetail::className(), ['order_id' => 'id']);
     }
 
+    public function getWarehouseGoods()
+    {
+        return $this->hasMany(WarehouseGoods::className(), ['order_id' => 'id']);
+    }
+
     public function orderStatusText($order = null)
     {
         if (!$order) {
@@ -245,6 +251,8 @@ class Order extends ModelActiveRecord
                 $statusText = '待付款';
             } elseif ($order->is_send == 0) {
                 $statusText = $order->send_type == 1 ? '待核销' : '待发货';
+            } elseif ($order->is_send == 2) {
+                $statusText = '已付款';
             } elseif ($order->is_send == 1 && $order->is_confirm == 0) {
                 $statusText = $order->send_type == 1 ? '待核销' : '待收货';
             } elseif ($order->is_confirm == 1 && $order->is_sale == 0) {
@@ -516,7 +524,7 @@ class Order extends ModelActiveRecord
         $data['is_recycle'] = 0;
         $data['is_print_send_template'] = 0;
 
-        if ($order['is_send'] == 0 && $order['cancel_status'] != 1 && $order['is_recycle'] == 0 && $order['status'] != 0) {
+        if (in_array($order['is_send'],[0,2]) && $order['cancel_status'] != 1 && $order['is_recycle'] == 0 && $order['status'] != 0) {
             // 快递订单发货
             if ($order['is_pay'] == 1 || $order['pay_type'] == 2) {
                 if ($order['send_type'] == 0 && $order['is_send_show'] == 1) {

@@ -195,6 +195,9 @@ class UserCenterConfig extends Model
             if ((int)$k + 1 === 5) {
                 $item['link_url'] = '/pages/order/refund/index';
             }
+            if ((int)$k + 1 === 6) {
+                $item['link_url'] = '/pages/order/index/index?status=10';
+            }
             $item['open_type'] = PickLinkForm::OPEN_TYPE_2;
             $item['text'] = $orderInfoCount[$k] ?: '';
             $item['num'] = $orderInfoCount[$k] ? intval($orderInfoCount[$k]) : 0;

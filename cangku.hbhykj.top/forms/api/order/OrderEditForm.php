@@ -50,6 +50,7 @@ class OrderEditForm extends Model
             $form->is_store = 1;
             $form->relations = ['detailExpress.expressRelation.orderDetail', 'detailExpressRelation'];
             $form->is_vip_card = 1;
+			$form->warehouseGoods = 1;
             $order = $form->search();
 
             if (!$order) {

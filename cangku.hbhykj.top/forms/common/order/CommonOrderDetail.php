@@ -35,6 +35,7 @@ class CommonOrderDetail extends Model
     public $is_store;
     public $relations = [];
     public $is_vip_card;
+	public $warehouseGoods; 
 
     public function rules()
     {
@@ -59,6 +60,7 @@ class CommonOrderDetail extends Model
             'is_store' => 'setWithStore',
             'relations' => 'setRelations',
             'is_vip_card' => 'setWithVipCard',
+			'warehouseGoods' => 'setWarehouseGoods',
         ];
         return isset($array[$key]) ? $array[$key] : null;
     }
@@ -124,6 +126,11 @@ class CommonOrderDetail extends Model
     {
         $this->query->with($this->relations);
     }
+	
+	private function setWarehouseGoods()
+	{
+		$this->query->with('warehouseGoods');
+	}
 
     private function setWithVipCard()
     {

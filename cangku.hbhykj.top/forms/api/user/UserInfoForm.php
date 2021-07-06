@@ -29,6 +29,8 @@ use app\models\User;
 use app\models\UserCard;
 use app\models\UserCoupon;
 use app\models\UserInfo;
+use app\models\Order;
+use app\models\WarehouseOrderGoods;
 
 class UserInfoForm extends Model
 {
@@ -89,6 +91,10 @@ class UserInfoForm extends Model
             ->leftJoin(['g' => Goods::tableName()], 'g.id = f.goods_id')
             ->count();
 
+        $cankuCount = WarehouseOrderGoods::find()->select(['sum(num) as anum'])->where([
+			'user_id' => $user->id
+        ])->groupBy('goods_id')->having(['>','anum',0])->count();
+
         $permission = \Yii::$app->branch->childPermission(\Yii::$app->mall->user->adminInfo);
         $permissionFlip = array_flip($permission);
 
@@ -99,6 +105,7 @@ class UserInfoForm extends Model
             'integral' => $userInfo->integral,
             'balance' => $userInfo->balance,
             'options' => $userInfo,
+			'cankuCount' => $cankuCount ?? '0',
             'favorite' => $favoriteCount ?? '0',
             'footprint' => FootprintGoodsLog::find()->where(['user_id' => $user->id, 'is_delete' => 0])->count() ?? '0',
             'identity' => [

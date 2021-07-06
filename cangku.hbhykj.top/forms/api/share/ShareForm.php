@@ -125,7 +125,7 @@ class ShareForm extends Model
     public function getOrderCount()
     {
         $user_id = \Yii::$app->user->id;
-        $orderQuery = Order::find()->andWhere(['!=', 'cancel_status', 1])
+        $orderQuery = Order::find()->andWhere(['!=', 'cancel_status', 1])->andWhere(['!=', 'is_send', 2])
             ->andWhere(['mall_id' => \Yii::$app->mall->id, 'is_recycle' => 0, 'is_delete' => 0])
             ->select('id');
         $query = ShareOrder::find()->select("

@@ -64,12 +64,13 @@
                         label="名称"
                         show-overflow-tooltip>
                     <template slot-scope="scope">
-                        <el-tag v-if="scope.row.expressRelation" type="success" size="mini">已发货</el-tag>
+                        <el-tag v-if="scope.row.expressRelation && (scope.row.expressRelation.number == 0 || scope.row.expressRelation.number >= scope.row.goods_info.goods_attr.number)" type="success" size="mini">已发货</el-tag>
+                        <el-tag v-else-if="scope.row.expressRelation && scope.row.expressRelation.number < scope.row.goods_info.goods_attr.number" type="success" size="mini">部分发货</el-tag>
                         <span>{{scope.row.goods_info.goods_attr.name}}</span>
                     </template>
                 </el-table-column>
                 <el-table-column
-                        prop="goods_info.goods_attr.number"
+                        prop="num"
                         label="数量"
                         width="80"
                         show-overflow-tooltip>
@@ -358,15 +359,30 @@
             },
             getExpressData() {
                 let self = this;
-                self.orderDetail = self.order.detail;
-                // 默认全选
-                self.orderDetail.forEach(row => {
-                    if (!row.expressRelation) {
-                        setTimeout(() => {
-                            self.$refs.multipleTable.toggleRowSelection(row, true);
-                        }, 1)
-                    }
-                });
+                if(self.order.is_send == 2)
+                {
+                    self.orderDetail = [];
+                    self.order.warehouseGoods.forEach(row => {
+                        self.order.detail.forEach(detail => {
+                            if(row.detail_id == detail.id && row.flag == 0) {
+                                self.orderDetail.push({...detail,warehouse_goods_id:row.id,num:row.num});
+                            }
+                        })
+                    })
+                }
+                else
+                {
+                    self.orderDetail = self.order.detail;
+                    // 默认全选
+                    self.orderDetail.forEach(row => {
+                        if (!row.expressRelation) {
+                            setTimeout(() => {
+                                self.$refs.multipleTable.toggleRowSelection(row, true);
+                            }, 1)
+                        }
+                    });
+                }
+
             },
             getExpressId: function (newVal) {
                 let self = this;
@@ -398,12 +414,14 @@
             send_order(e, formName) {
                 let self = this;
                 let res = self.getOrderDetailId();
+                let whres = self.getWarehouseGoodsId();
                 if (res.length <= 0) {
                     this.$message.error('请选择发货商品');
                     // this.closeDialog()
                     return false;
                 }
                 e.order_detail_id = res;
+                e.warehouse_goods_id = whres;
                 self.$refs[formName].validate((valid) => {
                     if (valid) {
                         self.sendLoading = true;
@@ -487,6 +505,14 @@
                 });
                 return orderDetailId;
             },
+            getWarehouseGoodsId() {
+                // 选中的订单商品
+                let warehouseGoodsId = [];
+                this.multipleSelection.forEach(function (item) {
+                    warehouseGoodsId.push(item.warehouse_goods_id)
+                });
+                return warehouseGoodsId;
+            },                
             // 搜索建议
             querySearch(queryString, cb) {
                 var express_list = this.express_list;
@@ -580,7 +606,7 @@
                 this.multipleSelection = val;
             },
             selectInit(row, index) {
-                if (row.expressRelation) {
+                if (row.expressRelation && (row.expressRelation.number == 0 || row.expressRelation.number >= row.goods_info.goods_attr.number)) {
                     return false;
                 } else {
                     return true;
