@@ -151,7 +151,9 @@ class PayTypeEditForm extends Model
             $this->checkWxPay();
         } elseif ($this->type == 2) {
             $this->checkAliPay();
-        } else {
+        } elseif ($this->type == 3) {
+			$this->checkAllinpayPay();
+		} else {
             throw new \Exception('支付类型错误');
         }
     }
@@ -191,4 +193,18 @@ class PayTypeEditForm extends Model
     private function checkAliPay()
     {
     }
+	
+	private function checkAllinpayPay()
+	{
+		$this->key_pem = $this->addBeginAndEnd(
+			'-----BEGIN RSA PRIVATE KEY-----',
+			'-----END RSA PRIVATE KEY-----',
+			$this->key_pem
+		);
+		$this->cert_pem = $this->addBeginAndEnd(
+			'-----BEGIN PUBLIC KEY-----',
+			'-----END PUBLIC KEY-----',
+			$this->cert_pem
+		);	
+	}
 }

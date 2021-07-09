@@ -533,4 +533,85 @@ class PayNotifyController extends Controller
     {
         \Yii::warning('同城配送接口回调测试');
     }
+
+    public function actionAllinpay()
+    {
+        $res = \Yii::$app->request->post();
+        \Yii::warning($res);
+        if (!$res) {
+            throw new \Exception('请求数据错误');
+        }
+        if (count($res)<1)
+        {
+            throw new \Exception('请求数据错误');
+        }        
+        $paymentOrderUnion = PaymentOrderUnion::findOne([
+            'order_no' => $res['cusorderid'],
+        ]);
+
+        if (!$paymentOrderUnion) {
+            throw new \Exception('订单不存在: ' . $res['cusorderid']);
+        }
+        if ($paymentOrderUnion->app_version) {
+            \Yii::$app->setAppVersion($paymentOrderUnion->app_version);
+        }
+        if ($paymentOrderUnion->is_pay === 1) {
+            echo "success";
+            return;
+        }
+        $mall = Mall::findOne($paymentOrderUnion->mall_id);
+        if (!$mall) {
+            throw new \Exception('未查询到id=' . $paymentOrderUnion->id . '的商城。 ');
+        }
+        \Yii::$app->setMall($mall);
+
+        $this->checkAllinpaysign($res, 'allinpay');
+
+        $paymentOrderUnionAmount = (doubleval($paymentOrderUnion->amount) * 100) . '';
+        if (intval($res['trxamt']) !== intval($paymentOrderUnionAmount)) {
+            throw new \Exception('支付金额与订单金额不一致。');
+        }
+
+        $paymentOrders = PaymentOrder::findAll(['payment_order_union_id' => $paymentOrderUnion->id]);
+        $paymentOrderUnion->is_pay = 1;
+        $paymentOrderUnion->pay_type = 13;
+        if (!$paymentOrderUnion->save()) {
+            throw new \Exception($paymentOrderUnion->getFirstErrors());
+        }
+        foreach ($paymentOrders as $paymentOrder) {
+            $Class = $paymentOrder->notify_class;
+            if (!class_exists($Class)) {
+                continue;
+            }
+            $paymentOrder->is_pay = 1;
+            $paymentOrder->pay_type = 13;
+            if (!$paymentOrder->save()) {
+                throw new \Exception($paymentOrder->getFirstErrors());
+            }
+            /** @var PaymentNotify $notify */
+            $notify = new $Class();
+            try {
+                $po = new \app\core\payment\PaymentOrder([
+                    'orderNo' => $paymentOrder->order_no,
+                    'amount' => (float)$paymentOrder->amount,
+                    'title' => $paymentOrder->title,
+                    'notifyClass' => $paymentOrder->notify_class,
+                    'payType' => \app\core\payment\PaymentOrder::PAY_TYPE_UNIONPAY
+                ]);
+                $notify->notify($po);
+            } catch (\Exception $e) {
+            }
+        }
+        echo "success";
+        return;        
+    }
+
+    private function checkAllinpaysign($res, $type)
+    {
+        $wechatPay = \Yii::$app->plugin->getPlugin($type)->getAllinpay();
+        $truthSign = $wechatPay->checkSign($res);
+        if ($truthSign !== 1) {
+            throw new \Exception('签名验证失败。');
+        }
+    }    
 }

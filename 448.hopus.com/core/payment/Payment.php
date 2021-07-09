@@ -25,6 +25,7 @@ use app\models\PaymentOrderUnion;
 use app\models\PaymentRefund;
 use app\models\QrCodeParameter;
 use app\models\User;
+use app\models\UserInfo;
 use app\plugins\teller\jobs\OrderQueryJob;
 use app\plugins\ttapp\forms\pay\TtPay;
 use app\plugins\wxapp\forms\Enum;
@@ -43,6 +44,7 @@ class Payment extends Component
     const PAY_TYPE_WECHAT_H5 = 'wechat_h5';
     const PAY_TYPE_ALIPAY_H5 = 'alipay_h5';
     const PAY_TYPE_UNIONPAY = 'unionpay';
+    const PAY_TYPE_ALLINPAY = 'allinpay';
 
     const PAY_TYPE_WECHAT_SCAN = 'wechat_scan';
     const PAY_TYPE_ALIPAY_SCAN = 'alipay_scan';
@@ -111,7 +113,7 @@ class Payment extends Component
                     $appendPayTypes[] = static::PAY_TYPE_TOUTIAO;
                     $appendPayTypes[] = static::PAY_TYPE_WECHAT_H5;
                     $appendPayTypes[] = static::PAY_TYPE_ALIPAY_H5;
-//                    $appendPayTypes[] = static::PAY_TYPE_UNIONPAY;
+                    $appendPayTypes[] = static::PAY_TYPE_ALLINPAY;
                     unset($supportPayTypes[$index]);
                     break;
                 }
@@ -418,6 +420,39 @@ class Payment extends Component
                     'id' => $paymentOrderUnion->id
                 ], $payData);
                 break;
+            case static::PAY_TYPE_ALLINPAY:
+                $plugin = \Yii::$app->plugin->getPlugin('allinpay');
+                $allinPay = $plugin->getAllinpay();
+                $userInfo = UserInfo::find()->andWhere(['user_id' => \Yii::$app->user->id])->one();
+                $payData = $allinPay->genData([
+                    'body' => $paymentOrderUnion->title,
+                    'reqsn' => $paymentOrderUnion->order_no,
+                    'trxamt' => $paymentOrderUnion->amount * 100,
+                    'notify_url' => $this->getNotifyUrl('allinpay.php'),
+                    'paytype' => 'W06',
+                    'validtime' => 1440,
+                    'acct' => $userInfo->platform_user_id,
+                    'randomstr' => uniqid(),
+                    'signtype' => 'RSA'
+                ]);
+                $appPayData = [];
+                if($payData && is_array($payData))
+                {
+                    $payinfo = \json_decode($payData['payinfo'],true);
+                    $appPayData = [
+                        'timeStamp' => $payinfo['timeStamp'],
+                        'nonceStr' => $payinfo['nonceStr'],
+                        'package' => $payinfo['package'],
+                        'signType' => $payinfo['signType'],
+                        'paySign' => $payinfo['paySign']
+                    ];
+                }
+
+                $data = array_merge([
+                    'pay_type' => $payType,
+                    'id' => $paymentOrderUnion->id,
+                ], $appPayData);                
+                break;                
             default:
                 throw new PaymentException('未知的`payType`。');
                 break;
@@ -960,6 +995,9 @@ class Payment extends Component
             case 12:
                 $class = 'app\\plugins\\teller\\forms\\AliScanRefund';
                 break;
+            case 13:
+                $class = 'app\\plugins\\allinpay\\forms\\AllinpayRefund';
+                break;                
             default:
                 throw new PaymentException('无效的支付方式');
         }

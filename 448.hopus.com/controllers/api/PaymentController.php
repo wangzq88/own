@@ -40,13 +40,14 @@ class PaymentController extends ApiController
         $supportPayTypes = (array)$paymentOrderUnion->decodeSupportPayTypes($paymentOrderUnion->support_pay_types);
         $payments = [
             Payment::PAY_TYPE_BALANCE,
-            Payment::PAY_TYPE_WECHAT,
+//            Payment::PAY_TYPE_WECHAT,
             Payment::PAY_TYPE_ALIPAY,
             Payment::PAY_TYPE_BAIDU,
             Payment::PAY_TYPE_TOUTIAO,
             Payment::PAY_TYPE_HUODAO,
             Payment::PAY_TYPE_WECHAT_H5,
             Payment::PAY_TYPE_ALIPAY_H5,
+            Payment::PAY_TYPE_ALLINPAY
         ];
         $resultPayments = [];
         $iconBaseUrl = \Yii::$app->request->hostInfo . '/' . \Yii::$app->request->baseUrl . '/statics/img/app/common/';
@@ -193,6 +194,21 @@ class PaymentController extends ApiController
                         'icon' => $iconBaseUrl . 'payment-huodao.png',
                     ];
                     break;
+                case 'allinpay':
+                    if ($paymentOrderUnion->amount == 0) {
+                        break;
+                    }
+                    if (!empty($supportPayTypes) && !in_array(Payment::PAY_TYPE_ALLINPAY, $supportPayTypes)) {
+                        break;
+                    }               
+                    $resultPayments[] = [
+                        'key' => Payment::PAY_TYPE_ALLINPAY,
+                        'name' => '微信支付',
+                        'desc' => null,
+                        'disabled' => false,
+                        'icon' => $iconBaseUrl . 'payment-wechat.png',
+                    ];
+                    break;                    
                 default:
                     break;
             }
@@ -262,4 +278,61 @@ class PaymentController extends ApiController
             ];
         }
     }
+    /**
+     * @param integer $id PaymentOrderUnion id
+     * @return array|\yii\web\Response
+     * @throws \yii\db\Exception
+     * @throws \Exception
+     */	
+	public function actionGetWXPayinfo()
+	{
+        $paymentOrderUnion = PaymentOrderUnion::findOne([
+            'id' => $id,
+        ]);
+        if (!$paymentOrderUnion) {
+            return $this->asJson([
+                'code' => ApiCode::CODE_ERROR,
+                'msg' => '待支付订单不存在。',
+            ]);
+        }
+		$userInfo = UserInfo::find()->andWhere(['user_id' => \Yii::$app->user->id])->one();
+		$params = array();
+		$params["cusid"] = AppConfig::CUSID;
+		$params["appid"] = AppConfig::APPID;
+		$params["version"] = AppConfig::APIVERSION;
+		$params["orgid"] = $orgid;
+		$params["trxamt"] = $paymentOrderUnion->amount * 100;
+		$params["reqsn"] = $paymentOrderUnion->order_no;
+		$params["paytype"] = 'W06';
+		$params["body"] = '';
+		$params["remark"] = '';
+		$params["validtime"] = 60;
+		$params["acct"] = $userInfo->platform_user_id;
+		$params["notify_url"] = 'https://448.houpus.com/web/wechat-mobile.php';
+		$params["limit_pay"] = '';
+		$params["sub_appid"] = AppConfig::SUBAPPID;
+		$params["subbranch"] = '';
+		$params["cusip"] = '';
+		$params["idno"] = '';
+		$params["truename"] = '';
+		$params["fqnum"] = '';
+		$params["randomstr"] = uniqid();
+		$params["signtype"] ='RSA';
+		$params["front_url"] = '';
+		$params["sign"] = AppUtil::Sign($params);//签名  
+		$paramsStr = AppUtil::ToUrlParams($params);
+	    $url = AppConfig::APIURL . "/pay";
+		$rsp = request($url, $paramsStr);
+	    $rspArray = json_decode($rsp, true); 
+	    if(validSign($rspArray)){
+			return [
+				'code' => ApiCode::CODE_SUCCESS,
+				'data' => $rspArray
+			];
+	    }
+		return[
+			'code' => ApiCode::CODE_ERROR,
+			'msg' => '支付令牌不符'
+		];				
+	}
 }

@@ -92,6 +92,7 @@ class PayTypeForm extends Model
         return [
             '1' => '微信',
             '2' => '支付宝',
+			'3' => '通联支付'
         ];
     }
 
