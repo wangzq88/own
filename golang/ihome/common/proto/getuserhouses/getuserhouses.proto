@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package getuserhouses;
+
+option go_package = "./proto/getuserhouses;getuserhouses";
+
+service Getuserhouses {
+	rpc Getuserhousescd(Request) returns (Response) {}
+	rpc Postuserhousecd(PostRequest) returns (PostResponse) {}
+	rpc UploadHouseImg(UploadImgRequest) returns (UploadImgResponse) {}
+	rpc SearchHouses(SearchRequest) returns (SearchResponse) {}
+	rpc GetIndex(IndexRequest) returns (IndexResponse) {}
+	rpc GetHousesDetail(DetailRequest) returns (DetailResponse) {}
+}
+
+message Request {
+	string sessionid = 1;
+}
+
+message Response {
+	string errno = 1;
+	string errmsg = 2;
+	bytes mix = 3;
+}
+
+message PostRequest {
+	string sessionid = 1;
+	bytes housejson = 2;
+}
+
+message PostResponse {
+	string errno = 1;
+	string errmsg = 2;
+	int64 house_id = 3;
+}
+
+message UploadImgRequest {
+	string sessionid = 1;
+	bytes house_image = 2;
+	string fileExt = 3;	
+	int64 house_id = 4;
+}
+
+message UploadImgResponse {
+	string errno = 1;
+	string errmsg = 2;
+	string avatar_url = 3;
+}
+
+message SearchRequest {
+	string aid = 1;
+	string sd = 2;
+	string ed = 3;
+	string sk = 4;
+	int64 p = 5;
+}
+
+message SearchResponse {
+	string errno = 1;
+	string errmsg = 2;
+	int64 current_page = 3;
+	int64 total_page = 4;
+	bytes houses = 5;
+}
+
+message IndexRequest {
+
+}
+
+message IndexResponse {
+	string errno = 1;
+	string errmsg = 2;
+	bytes houses = 3;
+}
+
+message DetailRequest {
+	int64 house_id = 1;
+	string sessionid = 2;
+}
+
+message DetailResponse {
+	string errno = 1;
+	string errmsg = 2;
+	bytes houses = 3;	
+	int64 user_id = 4;
+}

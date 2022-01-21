@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package getuserinfo;
+
+option go_package = "./proto/getuserinfo;getuserinfo";
+
+service Getuserinfo {
+	rpc Getuserinfocd(Request) returns (Response) {}
+	rpc UploadAvatar(UploadReq) returns (UploadResp) {}
+	rpc GetUserHouses(HousesRequest) returns (HousesResponse) {}
+}
+
+message Request {
+	string sessionid = 1;
+}
+
+message Response {
+	string errno = 1;
+	string errmsg = 2;
+	int64 user_id = 3;
+	string name = 4;
+	string mobile = 5;
+	string real_name = 6;
+	string id_card = 7;
+	string avatar_url = 8;
+}
+
+
+message UploadReq {
+	string sessionid = 1;
+	bytes avatar = 2;
+	string fileExt = 3;
+}
+
+message UploadResp{
+	string errno = 1;
+	string errmsg = 2;
+	string avatar_url = 3;
+}
+
+message HousesRequest {
+	string sessionid = 1;
+}
+
+message HousesResponse {
+	string errno = 1;
+	string errmsg = 2;
+	bytes mix = 3;
+}

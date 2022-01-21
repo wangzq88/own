@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "./proto;proto";
+
+service GetImg {
+	rpc MicroGetImg(Request) returns (Response) {}
+	rpc Stream(StreamingRequest) returns (stream StreamingResponse) {}
+	rpc PingPong(stream Ping) returns (stream Pong) {}
+}
+
+message Point {
+	int64 x = 1;
+	int64 y = 2;
+}
+
+message Request {
+	string uuid = 1;
+}
+
+message Response {
+	string errno = 1;
+	string errmsg = 2;
+	bytes pix = 3;
+	int64 stride = 4;
+	Point min = 5;
+	Point max = 6;
+}
+
+message StreamingRequest {
+	int64 count = 1;
+}
+
+message StreamingResponse {
+	int64 count = 1;
+}
+
+message Ping {
+	int64 stroke = 1;
+}
+
+message Pong {
+	int64 stroke = 1;
+}

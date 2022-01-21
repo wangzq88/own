@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package getorder;
+
+option go_package = "./proto/getorder;getorder";
+
+service GetUserOrder {
+	rpc PostOrder(PostRequest) returns (PostResponse) {}
+	rpc GetMyOrder(MyRequest) returns (MyResponse) {}
+}
+
+message PostRequest {
+	int64 house_id = 1;
+	string start_date = 2;
+	string end_date = 3;
+    string sessionid = 4;
+}
+
+message PostResponse {
+	string errno = 1;
+	string errmsg = 2;
+	int64 order_id = 3;
+}
+
+message MyRequest {
+	string sessionid = 1;
+	string role = 2;
+}
+
+message MyResponse {
+	string errno = 1;
+	string errmsg = 2;
+	bytes orderjson = 3;	
+} 
