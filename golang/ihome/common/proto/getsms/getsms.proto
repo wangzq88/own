@@ -17,4 +17,5 @@ message Request {
 message Response {
 	string errno = 1;
 	string errmsg = 2;
+	string code = 3;
 }

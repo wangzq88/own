@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.26.0
 // 	protoc        v3.19.1
-// source: proto/getimg/getImg.proto
+// source: proto/getimg/getimg.proto
 
 package getimg
 
@@ -32,7 +32,7 @@ type Point struct {
 func (x *Point) Reset() {
 	*x = Point{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_getimg_getImg_proto_msgTypes[0]
+		mi := &file_proto_getimg_getimg_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -45,7 +45,7 @@ func (x *Point) String() string {
 func (*Point) ProtoMessage() {}
 
 func (x *Point) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_getimg_getImg_proto_msgTypes[0]
+	mi := &file_proto_getimg_getimg_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -58,7 +58,7 @@ func (x *Point) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Point.ProtoReflect.Descriptor instead.
 func (*Point) Descriptor() ([]byte, []int) {
-	return file_proto_getimg_getImg_proto_rawDescGZIP(), []int{0}
+	return file_proto_getimg_getimg_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Point) GetX() int64 {
@@ -86,7 +86,7 @@ type Request struct {
 func (x *Request) Reset() {
 	*x = Request{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_getimg_getImg_proto_msgTypes[1]
+		mi := &file_proto_getimg_getimg_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -99,7 +99,7 @@ func (x *Request) String() string {
 func (*Request) ProtoMessage() {}
 
 func (x *Request) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_getimg_getImg_proto_msgTypes[1]
+	mi := &file_proto_getimg_getimg_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -112,7 +112,7 @@ func (x *Request) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Request.ProtoReflect.Descriptor instead.
 func (*Request) Descriptor() ([]byte, []int) {
-	return file_proto_getimg_getImg_proto_rawDescGZIP(), []int{1}
+	return file_proto_getimg_getimg_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *Request) GetUuid() string {
@@ -138,7 +138,7 @@ type Response struct {
 func (x *Response) Reset() {
 	*x = Response{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_getimg_getImg_proto_msgTypes[2]
+		mi := &file_proto_getimg_getimg_proto_msgTypes[2]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -151,7 +151,7 @@ func (x *Response) String() string {
 func (*Response) ProtoMessage() {}
 
 func (x *Response) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_getimg_getImg_proto_msgTypes[2]
+	mi := &file_proto_getimg_getimg_proto_msgTypes[2]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -164,7 +164,7 @@ func (x *Response) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Response.ProtoReflect.Descriptor instead.
 func (*Response) Descriptor() ([]byte, []int) {
-	return file_proto_getimg_getImg_proto_rawDescGZIP(), []int{2}
+	return file_proto_getimg_getimg_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *Response) GetErrno() string {
@@ -220,7 +220,7 @@ type StreamingRequest struct {
 func (x *StreamingRequest) Reset() {
 	*x = StreamingRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_getimg_getImg_proto_msgTypes[3]
+		mi := &file_proto_getimg_getimg_proto_msgTypes[3]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -233,7 +233,7 @@ func (x *StreamingRequest) String() string {
 func (*StreamingRequest) ProtoMessage() {}
 
 func (x *StreamingRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_getimg_getImg_proto_msgTypes[3]
+	mi := &file_proto_getimg_getimg_proto_msgTypes[3]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -246,7 +246,7 @@ func (x *StreamingRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StreamingRequest.ProtoReflect.Descriptor instead.
 func (*StreamingRequest) Descriptor() ([]byte, []int) {
-	return file_proto_getimg_getImg_proto_rawDescGZIP(), []int{3}
+	return file_proto_getimg_getimg_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *StreamingRequest) GetCount() int64 {
@@ -267,7 +267,7 @@ type StreamingResponse struct {
 func (x *StreamingResponse) Reset() {
 	*x = StreamingResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_getimg_getImg_proto_msgTypes[4]
+		mi := &file_proto_getimg_getimg_proto_msgTypes[4]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -280,7 +280,7 @@ func (x *StreamingResponse) String() string {
 func (*StreamingResponse) ProtoMessage() {}
 
 func (x *StreamingResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_getimg_getImg_proto_msgTypes[4]
+	mi := &file_proto_getimg_getimg_proto_msgTypes[4]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -293,7 +293,7 @@ func (x *StreamingResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StreamingResponse.ProtoReflect.Descriptor instead.
 func (*StreamingResponse) Descriptor() ([]byte, []int) {
-	return file_proto_getimg_getImg_proto_rawDescGZIP(), []int{4}
+	return file_proto_getimg_getimg_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *StreamingResponse) GetCount() int64 {
@@ -314,7 +314,7 @@ type Ping struct {
 func (x *Ping) Reset() {
 	*x = Ping{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_getimg_getImg_proto_msgTypes[5]
+		mi := &file_proto_getimg_getimg_proto_msgTypes[5]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -327,7 +327,7 @@ func (x *Ping) String() string {
 func (*Ping) ProtoMessage() {}
 
 func (x *Ping) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_getimg_getImg_proto_msgTypes[5]
+	mi := &file_proto_getimg_getimg_proto_msgTypes[5]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -340,7 +340,7 @@ func (x *Ping) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Ping.ProtoReflect.Descriptor instead.
 func (*Ping) Descriptor() ([]byte, []int) {
-	return file_proto_getimg_getImg_proto_rawDescGZIP(), []int{5}
+	return file_proto_getimg_getimg_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *Ping) GetStroke() int64 {
@@ -361,7 +361,7 @@ type Pong struct {
 func (x *Pong) Reset() {
 	*x = Pong{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_proto_getimg_getImg_proto_msgTypes[6]
+		mi := &file_proto_getimg_getimg_proto_msgTypes[6]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -374,7 +374,7 @@ func (x *Pong) String() string {
 func (*Pong) ProtoMessage() {}
 
 func (x *Pong) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_getimg_getImg_proto_msgTypes[6]
+	mi := &file_proto_getimg_getimg_proto_msgTypes[6]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -387,7 +387,7 @@ func (x *Pong) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Pong.ProtoReflect.Descriptor instead.
 func (*Pong) Descriptor() ([]byte, []int) {
-	return file_proto_getimg_getImg_proto_rawDescGZIP(), []int{6}
+	return file_proto_getimg_getimg_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *Pong) GetStroke() int64 {
@@ -397,11 +397,11 @@ func (x *Pong) GetStroke() int64 {
 	return 0
 }
 
-var File_proto_getimg_getImg_proto protoreflect.FileDescriptor
+var File_proto_getimg_getimg_proto protoreflect.FileDescriptor
 
-var file_proto_getimg_getImg_proto_rawDesc = []byte{
+var file_proto_getimg_getimg_proto_rawDesc = []byte{
 	0x0a, 0x19, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x67, 0x65, 0x74, 0x69, 0x6d, 0x67, 0x2f, 0x67,
-	0x65, 0x74, 0x49, 0x6d, 0x67, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x06, 0x67, 0x65, 0x74,
+	0x65, 0x74, 0x69, 0x6d, 0x67, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x06, 0x67, 0x65, 0x74,
 	0x69, 0x6d, 0x67, 0x22, 0x23, 0x0a, 0x05, 0x50, 0x6f, 0x69, 0x6e, 0x74, 0x12, 0x0c, 0x0a, 0x01,
 	0x78, 0x18, 0x01, 0x20, 0x01, 0x28, 0x03, 0x52, 0x01, 0x78, 0x12, 0x0c, 0x0a, 0x01, 0x79, 0x18,
 	0x02, 0x20, 0x01, 0x28, 0x03, 0x52, 0x01, 0x79, 0x22, 0x1d, 0x0a, 0x07, 0x52, 0x65, 0x71, 0x75,
@@ -443,19 +443,19 @@ var file_proto_getimg_getImg_proto_rawDesc = []byte{
 }
 
 var (
-	file_proto_getimg_getImg_proto_rawDescOnce sync.Once
-	file_proto_getimg_getImg_proto_rawDescData = file_proto_getimg_getImg_proto_rawDesc
+	file_proto_getimg_getimg_proto_rawDescOnce sync.Once
+	file_proto_getimg_getimg_proto_rawDescData = file_proto_getimg_getimg_proto_rawDesc
 )
 
-func file_proto_getimg_getImg_proto_rawDescGZIP() []byte {
-	file_proto_getimg_getImg_proto_rawDescOnce.Do(func() {
-		file_proto_getimg_getImg_proto_rawDescData = protoimpl.X.CompressGZIP(file_proto_getimg_getImg_proto_rawDescData)
+func file_proto_getimg_getimg_proto_rawDescGZIP() []byte {
+	file_proto_getimg_getimg_proto_rawDescOnce.Do(func() {
+		file_proto_getimg_getimg_proto_rawDescData = protoimpl.X.CompressGZIP(file_proto_getimg_getimg_proto_rawDescData)
 	})
-	return file_proto_getimg_getImg_proto_rawDescData
+	return file_proto_getimg_getimg_proto_rawDescData
 }
 
-var file_proto_getimg_getImg_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
-var file_proto_getimg_getImg_proto_goTypes = []interface{}{
+var file_proto_getimg_getimg_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_proto_getimg_getimg_proto_goTypes = []interface{}{
 	(*Point)(nil),             // 0: getimg.Point
 	(*Request)(nil),           // 1: getimg.Request
 	(*Response)(nil),          // 2: getimg.Response
@@ -464,7 +464,7 @@ var file_proto_getimg_getImg_proto_goTypes = []interface{}{
 	(*Ping)(nil),              // 5: getimg.Ping
 	(*Pong)(nil),              // 6: getimg.Pong
 }
-var file_proto_getimg_getImg_proto_depIdxs = []int32{
+var file_proto_getimg_getimg_proto_depIdxs = []int32{
 	0, // 0: getimg.Response.min:type_name -> getimg.Point
 	0, // 1: getimg.Response.max:type_name -> getimg.Point
 	1, // 2: getimg.GetImg.MicroGetImg:input_type -> getimg.Request
@@ -480,13 +480,13 @@ var file_proto_getimg_getImg_proto_depIdxs = []int32{
 	0, // [0:2] is the sub-list for field type_name
 }
 
-func init() { file_proto_getimg_getImg_proto_init() }
-func file_proto_getimg_getImg_proto_init() {
-	if File_proto_getimg_getImg_proto != nil {
+func init() { file_proto_getimg_getimg_proto_init() }
+func file_proto_getimg_getimg_proto_init() {
+	if File_proto_getimg_getimg_proto != nil {
 		return
 	}
 	if !protoimpl.UnsafeEnabled {
-		file_proto_getimg_getImg_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_getimg_getimg_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Point); i {
 			case 0:
 				return &v.state
@@ -498,7 +498,7 @@ func file_proto_getimg_getImg_proto_init() {
 				return nil
 			}
 		}
-		file_proto_getimg_getImg_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_getimg_getimg_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Request); i {
 			case 0:
 				return &v.state
@@ -510,7 +510,7 @@ func file_proto_getimg_getImg_proto_init() {
 				return nil
 			}
 		}
-		file_proto_getimg_getImg_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_getimg_getimg_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Response); i {
 			case 0:
 				return &v.state
@@ -522,7 +522,7 @@ func file_proto_getimg_getImg_proto_init() {
 				return nil
 			}
 		}
-		file_proto_getimg_getImg_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_getimg_getimg_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*StreamingRequest); i {
 			case 0:
 				return &v.state
@@ -534,7 +534,7 @@ func file_proto_getimg_getImg_proto_init() {
 				return nil
 			}
 		}
-		file_proto_getimg_getImg_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_getimg_getimg_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*StreamingResponse); i {
 			case 0:
 				return &v.state
@@ -546,7 +546,7 @@ func file_proto_getimg_getImg_proto_init() {
 				return nil
 			}
 		}
-		file_proto_getimg_getImg_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_getimg_getimg_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Ping); i {
 			case 0:
 				return &v.state
@@ -558,7 +558,7 @@ func file_proto_getimg_getImg_proto_init() {
 				return nil
 			}
 		}
-		file_proto_getimg_getImg_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_proto_getimg_getimg_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*Pong); i {
 			case 0:
 				return &v.state
@@ -575,18 +575,18 @@ func file_proto_getimg_getImg_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: file_proto_getimg_getImg_proto_rawDesc,
+			RawDescriptor: file_proto_getimg_getimg_proto_rawDesc,
 			NumEnums:      0,
 			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_proto_getimg_getImg_proto_goTypes,
-		DependencyIndexes: file_proto_getimg_getImg_proto_depIdxs,
-		MessageInfos:      file_proto_getimg_getImg_proto_msgTypes,
+		GoTypes:           file_proto_getimg_getimg_proto_goTypes,
+		DependencyIndexes: file_proto_getimg_getimg_proto_depIdxs,
+		MessageInfos:      file_proto_getimg_getimg_proto_msgTypes,
 	}.Build()
-	File_proto_getimg_getImg_proto = out.File
-	file_proto_getimg_getImg_proto_rawDesc = nil
-	file_proto_getimg_getImg_proto_goTypes = nil
-	file_proto_getimg_getImg_proto_depIdxs = nil
+	File_proto_getimg_getimg_proto = out.File
+	file_proto_getimg_getimg_proto_rawDesc = nil
+	file_proto_getimg_getimg_proto_goTypes = nil
+	file_proto_getimg_getimg_proto_depIdxs = nil
 }

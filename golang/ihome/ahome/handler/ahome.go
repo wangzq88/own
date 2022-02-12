@@ -160,7 +160,7 @@ func PostRet(ctx *gin.Context) {
 	})
 	val, err := ctx.Cookie("sessionid")
 	if err != nil || val == "" {
-		ctx.SetCookie("sessionid", rsp.Name, 3600, "/", "129.226.134.90", false, true)
+		ctx.SetCookie("sessionid", rsp.Name, 3600, "/", model.AvatarDomain, false, true)
 	}
 	result["errno"] = rsp.Errno
 	result["errmsg"] = rsp.Errmsg
@@ -243,7 +243,7 @@ func Login(ctx *gin.Context) {
 		Password: reg.PassWord,
 	})
 	if err == nil {
-		ctx.SetCookie("sessionid", rsp.Sessionid, 3600, "/", "129.226.134.90", false, true)
+		ctx.SetCookie("sessionid", rsp.Sessionid, 3600, "/", model.AvatarDomain, false, true)
 	}
 	result["errno"] = rsp.Errno
 	result["errmsg"] = rsp.Errmsg
