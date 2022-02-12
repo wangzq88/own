@@ -2,7 +2,8 @@ package main
 
 import (
 	"postret/handler"
-	pb "postret/proto"
+
+	pb "go.micro.srv/common/proto/postret"
 
 	"github.com/micro/micro/v3/service"
 	"github.com/micro/micro/v3/service/logger"

@@ -4,6 +4,8 @@ go 1.15
 
 require (
 	github.com/micro/micro/v3 v3.0.0
+	github.com/weilaihui/fdfs_client v0.0.0-00010101000000-000000000000
+	github.com/weilaihui/goconfig v0.0.0-20120311132236-5eb5594b15a3 // indirect	
 	go.micro.srv/common v0.0.0-incompatible
 )
 
@@ -11,3 +13,4 @@ require (
 // see https://github.com/etcd-io/etcd/issues/11154 and https://github.com/etcd-io/etcd/issues/11931.
 replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
 replace go.micro.srv/common => ../../common
+replace github.com/weilaihui/fdfs_client => ../../go_fdfs_client

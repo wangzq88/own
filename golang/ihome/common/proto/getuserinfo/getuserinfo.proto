@@ -8,6 +8,7 @@ service Getuserinfo {
 	rpc Getuserinfocd(Request) returns (Response) {}
 	rpc UploadAvatar(UploadReq) returns (UploadResp) {}
 	rpc GetUserHouses(HousesRequest) returns (HousesResponse) {}
+	rpc PutUserName(SetNameRequest) returns (SetNameResponse) {}
 }
 
 message Request {
@@ -46,4 +47,14 @@ message HousesResponse {
 	string errno = 1;
 	string errmsg = 2;
 	bytes mix = 3;
+}
+
+message SetNameRequest {
+	string sessionid = 1;
+	string name = 2;
+}
+
+message SetNameResponse {
+	string errno = 1;
+	string errmsg = 2;
 }

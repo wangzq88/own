@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"encoding/json"
+
 	log "github.com/micro/micro/v3/service/logger"
 	"github.com/weilaihui/fdfs_client"
 	"go.micro.srv/common/model"
@@ -81,31 +82,51 @@ func (e *Getuserinfo) UploadAvatar(ctx context.Context, req *getuserinfo.UploadR
 // Call is a single request handler called via client.Call or the generated client code
 func (e *Getuserinfo) GetUserHouses(ctx context.Context, req *getuserinfo.HousesRequest, rsp *getuserinfo.HousesResponse) error {
 	log.Info("Received Getuserinfo.GetUserHouses request")
-
-	if mobile, err := model.GetSessionMobile(req.Sessionid); err != nil {
+	mobile, err := model.GetSessionMobile(req.Sessionid)
+	if err != nil {
 		rsp.Errno = utils.RECODE_SESSIONERR
 		rsp.Errmsg = utils.RecodeText(utils.RECODE_SESSIONERR)
 		return nil
 	}
-
-	if user, err := model.GetUser(mobile); err != nil {
+	user, err := model.GetUser(mobile)
+	if err != nil {
 		rsp.Errno = utils.RECODE_USERERR
 		rsp.Errmsg = utils.RecodeText(utils.RECODE_USERERR)
 		return nil
 	}
-
-	if houses, err := model.GetHouses(user.ID); err != nil {
+	houses, err := model.GetHouses(user.ID)
+	if err != nil {
 		rsp.Errno = utils.RECODE_DBERR
 		rsp.Errmsg = utils.RecodeText(utils.RECODE_DBERR)
 		return nil
 	}
-	result := map[string]interface{}{
-		"user":user,
-		"house_list":houses
-	}
-	result, _ = json.Marshal(result)
+	result, _ := json.Marshal(houses)
 	rsp.Errno = utils.RECODE_OK
 	rsp.Errmsg = utils.RecodeText(utils.RECODE_OK)
 	rsp.Mix = result
+	return nil
+}
+
+func (e *Getuserinfo) PutUserName(ctx context.Context, req *getuserinfo.SetNameRequest, rsp *getuserinfo.SetNameResponse) error {
+	log.Info("Received Getuserinfo.PutUserName request")
+	mobile, err := model.GetSessionMobile(req.Sessionid)
+	if err != nil {
+		rsp.Errno = utils.RECODE_SESSIONERR
+		rsp.Errmsg = utils.RecodeText(utils.RECODE_SESSIONERR)
+		return nil
+	}
+	user, err := model.GetUser(mobile)
+	if err != nil {
+		rsp.Errno = utils.RECODE_USERERR
+		rsp.Errmsg = utils.RecodeText(utils.RECODE_USERERR)
+		return nil
+	}
+	if err := model.SaveUserName(user.ID, req.Name); err != nil {
+		rsp.Errno = utils.RECODE_DBERR
+		rsp.Errmsg = utils.RecodeText(utils.RECODE_DBERR)
+		return nil
+	}
+	rsp.Errno = utils.RECODE_OK
+	rsp.Errmsg = utils.RecodeText(utils.RECODE_OK)
 	return nil
 }

@@ -2,7 +2,8 @@ package main
 
 import (
 	"postlogin/handler"
-	pb "postlogin/proto"
+
+	pb "go.micro.srv/common/proto/postlogin"
 
 	"github.com/micro/micro/v3/service"
 	"github.com/micro/micro/v3/service/logger"

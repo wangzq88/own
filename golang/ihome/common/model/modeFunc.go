@@ -1,6 +1,7 @@
 package model
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"time"
@@ -29,6 +30,64 @@ func SaveSession(sessionid string, user User) error {
 	return nil
 }
 
+//存短信验证码
+func SaveImgRnd(uuid, rnd string) error {
+	return GlobalRedis.Set(Ctx, uuid, rnd, time.Second*3600).Err()
+}
+
+//获取所有地域信息
+func GetArea() ([]Area, error) {
+	//连接数据库
+	var areas []Area
+	v1, err := GlobalRedis.Get(Ctx, "areas").Result()
+	if err != nil {
+		if err := GlobalDB.Find(&areas).Error; err != nil {
+			return areas, err
+		}
+		areaJson, err := json.Marshal(areas)
+		if err != nil {
+			return nil, err
+		}
+		err = GlobalRedis.Set(Ctx, "areas", areaJson, 0).Err()
+		fmt.Println("写入 redis 中")
+		if err != nil {
+			return nil, err
+		}
+		fmt.Println("从mysql中获取数据")
+	} else {
+		json.Unmarshal([]byte(v1), &areas)
+		fmt.Println("从redis中获取数据")
+	}
+
+	return areas, nil
+}
+
+//存储用户名和密码  mysql
+func SaveUser(mobile, password_hash string) (User, error) {
+	//链接数据库  gorm插入数据
+	var user User
+	user.Mobile = mobile
+	user.Password_hash = password_hash
+	user.Name = mobile
+
+	return user, GlobalDB.Create(&user).Error
+}
+
+//存短信验证码
+func GetSmsCode(phone string) (string, error) {
+	return GlobalRedis.Get(Ctx, phone+"_code").Result()
+}
+
+//获取图片验证码
+func GetImgCode(uuid string) (string, error) {
+	return GlobalRedis.Get(Ctx, uuid).Result()
+}
+
+//存短信验证码
+func SaveSmsCode(phone, vcode string) error {
+	return GlobalRedis.Set(Ctx, phone+"_code", vcode, time.Second*3600).Err()
+}
+
 //存储用户名和密码  mysql
 func GetUser(mobile string) (User, error) {
 	//链接数据库  gorm插入数据
@@ -40,6 +99,11 @@ func GetUser(mobile string) (User, error) {
 //存储用户头像   更新
 func SaveUserAvatar(userID int, avatarUrl string) error {
 	return GlobalDB.Model(new(User)).Where("id = ?", userID).Update("avatar_url", avatarUrl).Error
+}
+
+//存储用户头像   更新
+func SaveUserName(userID int, name string) error {
+	return GlobalDB.Model(new(User)).Where("id = ?", userID).Update("name", name).Error
 }
 
 //存储用户头像   更新
@@ -203,6 +267,12 @@ func GetHouseDetail(houseID int64, house map[string]interface{}) error {
 	house["title"] = val.Title
 	house["user_avatar"] = "http://" + AvatarDomain + "/" + user.Avatar_url
 	house["user_id"] = user.ID
+	house["min_days"] = val.Min_days
+	house["max_days"] = val.Max_days
+	house["capacity"] = val.Capacity
+	house["beds"] = val.Beds
+	house["acreage"] = val.Acreage
+	house["unit"] = val.Unit
 	//获取房屋的家具信息  多对多查询
 	var facs []Facility
 	if err := GlobalDB.Model(&val).Related(&facs, "Facilities").Error; err != nil {
@@ -221,11 +291,11 @@ func GetHouseDetail(houseID int64, house map[string]interface{}) error {
 	var commentList []interface{}
 	for _, v := range orders {
 		commentTemp := make(map[string]interface{})
-		commentTemp["Comment"] = v.Comment
-		commentTemp["Ctime"] = v.CreatedAt.Format("2006-01-02 15:04:05")
+		commentTemp["comment"] = v.Comment
+		commentTemp["ctime"] = v.CreatedAt.Format("2006-01-02 15:04:05")
 		var tempUser User
 		GlobalDB.Model(&v).Related(&tempUser)
-		commentTemp["UserName"] = tempUser.Name
+		commentTemp["userName"] = tempUser.Name
 		commentList = append(commentList, &commentTemp)
 	}
 	house["comments"] = commentList
@@ -318,4 +388,8 @@ func UpdateStatus(id int64, action, reason string) error {
 		//表示房东不同意订单  如果拒单把拒绝的原因写到comment中
 		return db.Updates(map[string]interface{}{"status": "REJECTED", "comment": reason}).Error
 	}
+}
+
+func AddOrderComment(id int64, comment string) error {
+	return GlobalDB.Model(new(OrderHouse)).Where("id = ?", id).Update("comment", comment).Error
 }

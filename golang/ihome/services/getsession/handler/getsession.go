@@ -2,10 +2,11 @@ package handler
 
 import (
 	"context"
-	"getsession/model"
+	"strconv"
+
+	"go.micro.srv/common/model"
 	"go.micro.srv/common/proto/getsession"
 	"go.micro.srv/common/utils"
-	"strconv"
 
 	log "github.com/micro/micro/v3/service/logger"
 )

@@ -1,11 +1,6 @@
 package handler
 
 import (
-	"ahome/proto/getarea"
-	"ahome/proto/getimg"
-	"ahome/proto/getsms"
-	"ahome/proto/postlogin"
-	"ahome/proto/postret"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -19,11 +14,16 @@ import (
 	"time"
 
 	"go.micro.srv/common/model"
+	"go.micro.srv/common/proto/getarea"
+	"go.micro.srv/common/proto/getimg"
 	"go.micro.srv/common/proto/getorder"
 	"go.micro.srv/common/proto/getsession"
+	"go.micro.srv/common/proto/getsms"
 	"go.micro.srv/common/proto/getuserhouses"
 	"go.micro.srv/common/proto/getuserinfo"
 	"go.micro.srv/common/proto/postauth"
+	"go.micro.srv/common/proto/postlogin"
+	"go.micro.srv/common/proto/postret"
 	"go.micro.srv/common/utils"
 
 	"github.com/afocus/captcha"
@@ -98,7 +98,11 @@ func GetSmscd(ctx *gin.Context) {
 	text := ctx.Query("text")
 	//获取验证码图片的uuid
 	uuid := ctx.Query("id")
-
+	result := map[string]interface{}{
+		"errno":  utils.RECODE_DATAERR,
+		"errmsg": utils.RecodeText(utils.RECODE_DATAERR),
+	}
+	defer ctx.JSON(http.StatusOK, result)
 	//校验数据
 	if mobile == "" || text == "" || uuid == "" {
 		fmt.Println("传入数据不完整")
@@ -118,13 +122,11 @@ func GetSmscd(ctx *gin.Context) {
 	})
 	if err != nil {
 		fmt.Println("Error calling getsms: ", err)
-		return
+		//return
 	}
-	result := map[string]interface{}{
-		"errno":  rsp.Errno,
-		"errmsg": rsp.Errmsg,
-	}
-	ctx.JSON(http.StatusOK, result)
+	result["errno"] = rsp.Errno
+	result["errmsg"] = rsp.Errmsg
+	result["code"] = rsp.Code
 }
 
 //注册方法
@@ -141,10 +143,10 @@ func PostRet(ctx *gin.Context) {
 		"errno":  utils.RECODE_PARAMERR,
 		"errmsg": utils.RecodeText(utils.RECODE_PARAMERR),
 	}
-	//defer ctx.JSON(http.StatusOK, result)
+	defer ctx.JSON(http.StatusOK, result)
 	//校验数据
 	if err != nil {
-		ctx.JSON(http.StatusOK, result)
+		//ctx.JSON(http.StatusOK, result)
 		return
 	}
 	srv := service.New()
@@ -162,7 +164,6 @@ func PostRet(ctx *gin.Context) {
 	}
 	result["errno"] = rsp.Errno
 	result["errmsg"] = rsp.Errmsg
-	ctx.JSON(http.StatusOK, result)
 }
 
 func Session(ctx *gin.Context) {
@@ -270,7 +271,7 @@ func GetUser(ctx *gin.Context) {
 	data["mobile"] = rsp.Mobile
 	data["real_name"] = rsp.RealName
 	data["id_card"] = rsp.IdCard
-	data["avatar_url"] = rsp.AvatarUrl
+	data["avatar_url"] = "http://" + model.AvatarDomain + "/" + rsp.AvatarUrl
 	result["errno"] = rsp.Errno
 	result["errmsg"] = rsp.Errmsg
 	result["data"] = data
@@ -673,6 +674,55 @@ func SetOrderStatus(ctx *gin.Context) {
 		OrderId: int64(order_id),
 		Action:  statusStu.Action,
 		Reason:  statusStu.Reason,
+	})
+	result["errno"] = rsp.Errno
+	result["errmsg"] = rsp.Errmsg
+}
+
+type CommentStu struct {
+	Comment string `json:"comment"`
+}
+
+func SetComment(ctx *gin.Context) {
+	result := make(map[string]interface{})
+	defer ctx.JSON(http.StatusOK, result)
+	var comStu CommentStu
+	ctx.Bind(&comStu)
+	order_id, _ := strconv.Atoi(ctx.Param("order_id"))
+	srv := service.New()
+	//初始化客户端
+	client := getorder.NewGetUserOrderService("go.micro.srv.getorder", srv.Client())
+	//调用远程客户端
+	rsp, _ := client.PutOrderComment(context.Background(), &getorder.SetCommentRequest{
+		OrderId: int64(order_id),
+		Comment: comStu.Comment,
+	})
+	result["errno"] = rsp.Errno
+	result["errmsg"] = rsp.Errmsg
+}
+
+type UserPut struct {
+	Name string `json:"name" binding:"required"`
+}
+
+func SetUserName(ctx *gin.Context) {
+	result := make(map[string]interface{})
+	defer ctx.JSON(http.StatusOK, result)
+	sessionid, err := ctx.Cookie("sessionid")
+	if err != nil {
+		result["errno"] = utils.RECODE_SESSIONERR
+		result["errmsg"] = utils.RecodeText(utils.RECODE_SESSIONERR)
+		return
+	}
+	var userp UserPut
+	ctx.Bind(&userp)
+	srv := service.New()
+	//初始化客户端
+	client := getuserinfo.NewGetuserinfoService("go.micro.srv.getuserinfo", srv.Client())
+	//调用远程客户端
+	rsp, _ := client.PutUserName(context.Background(), &getuserinfo.SetNameRequest{
+		Sessionid: sessionid,
+		Name:      userp.Name,
 	})
 	result["errno"] = rsp.Errno
 	result["errmsg"] = rsp.Errmsg

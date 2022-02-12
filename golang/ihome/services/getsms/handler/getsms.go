@@ -2,16 +2,15 @@ package handler
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"math/rand"
 	"time"
 
 	log "github.com/micro/micro/v3/service/logger"
 
-	"getsms/model"
-	"getsms/proto"
-	"getsms/utils"
+	"go.micro.srv/common/model"
+	proto "go.micro.srv/common/proto/getsms"
+	"go.micro.srv/common/utils"
 
 	"github.com/aliyun/alibaba-cloud-sdk-go/sdk"
 	"github.com/aliyun/alibaba-cloud-sdk-go/sdk/requests"
@@ -25,7 +24,8 @@ func (e *Getsms) SmsCode(ctx context.Context, req *proto.Request, rsp *proto.Res
 	if err != nil {
 		rsp.Errno = utils.RECODE_NODATA
 		rsp.Errmsg = utils.RecodeText(utils.RECODE_NODATA)
-		return err
+		return nil
+		//return err
 	}
 	//判断手机号码是否存在
 	var user model.User
@@ -33,22 +33,24 @@ func (e *Getsms) SmsCode(ctx context.Context, req *proto.Request, rsp *proto.Res
 	if result.Error == nil {
 		rsp.Errno = utils.RECODE_USERONERR
 		rsp.Errmsg = utils.RecodeText(utils.RECODE_USERONERR)
-		//返回自定义的error数据
-		return errors.New("用户已经注册")
+		//返回自定义的error数据，上面的 rsp 信息并不会返回。{"Id":"go.micro.client","Code":500,"Detail":"用户已经注册","Status":"Internal Server Error"}
+		//return errors.New("用户已经注册")
+		return nil
 	}
 	//判断输入的图片验证码是否正确
 	if req.Text != rnd {
 		rsp.Errno = utils.RECODE_DATAERR
 		rsp.Errmsg = utils.RecodeText(utils.RECODE_DATAERR)
-		//返回自定义的error数据
-		return errors.New("验证码输入错误")
+		//返回自定义的error数据，上面的 rsp 信息并不会返回。返回的是这样的信息：{"Id":"go.micro.client","Code":500,"Detail":"验证码输入错误","Status":"Internal Server Error"}
+		//return errors.New("验证码输入错误")
+		return nil
 	}
 	//如果成功,发送短信,存储短信验证码  阿里云短信接口
 	client, err := sdk.NewClientWithAccessKey("default", "LTAI4FexwrAFbn4ua4DHAyXh", "AltI2inQ1I5TqAEwAfrJNgP54VnVOx")
 	if err != nil {
 		rsp.Errno = utils.RECODE_DATAERR
 		rsp.Errmsg = utils.RecodeText(utils.RECODE_DATAERR)
-		return err
+		//return err
 	}
 	//获取6位数随机码
 	myRnd := rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -79,10 +81,11 @@ func (e *Getsms) SmsCode(ctx context.Context, req *proto.Request, rsp *proto.Res
 	if err != nil {
 		rsp.Errno = utils.RECODE_DBERR
 		rsp.Errmsg = utils.RecodeText(utils.RECODE_DBERR)
-		return err
+		//return err
 	}
 
 	rsp.Errno = utils.RECODE_OK
 	rsp.Errmsg = utils.RecodeText(utils.RECODE_OK)
+	rsp.Code = vcode
 	return nil
 }

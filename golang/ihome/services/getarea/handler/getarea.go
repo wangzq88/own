@@ -3,10 +3,10 @@ package handler
 import (
 	"context"
 
-	model "getarea/model"
-	proto "getarea/proto"
-	utils "getarea/utils"
 	log "github.com/micro/micro/v3/service/logger"
+	"go.micro.srv/common/model"
+	proto "go.micro.srv/common/proto/getarea"
+	"go.micro.srv/common/utils"
 )
 
 type GetArea struct{}

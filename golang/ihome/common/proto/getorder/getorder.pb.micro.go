@@ -44,6 +44,8 @@ func NewGetUserOrderEndpoints() []*api.Endpoint {
 type GetUserOrderService interface {
 	PostOrder(ctx context.Context, in *PostRequest, opts ...client.CallOption) (*PostResponse, error)
 	GetMyOrder(ctx context.Context, in *MyRequest, opts ...client.CallOption) (*MyResponse, error)
+	PutOrderStatus(ctx context.Context, in *SetStatusRequest, opts ...client.CallOption) (*SetStatusResponse, error)
+	PutOrderComment(ctx context.Context, in *SetCommentRequest, opts ...client.CallOption) (*SetCommentResponse, error)
 }
 
 type getUserOrderService struct {
@@ -78,17 +80,41 @@ func (c *getUserOrderService) GetMyOrder(ctx context.Context, in *MyRequest, opt
 	return out, nil
 }
 
+func (c *getUserOrderService) PutOrderStatus(ctx context.Context, in *SetStatusRequest, opts ...client.CallOption) (*SetStatusResponse, error) {
+	req := c.c.NewRequest(c.name, "GetUserOrder.PutOrderStatus", in)
+	out := new(SetStatusResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *getUserOrderService) PutOrderComment(ctx context.Context, in *SetCommentRequest, opts ...client.CallOption) (*SetCommentResponse, error) {
+	req := c.c.NewRequest(c.name, "GetUserOrder.PutOrderComment", in)
+	out := new(SetCommentResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for GetUserOrder service
 
 type GetUserOrderHandler interface {
 	PostOrder(context.Context, *PostRequest, *PostResponse) error
 	GetMyOrder(context.Context, *MyRequest, *MyResponse) error
+	PutOrderStatus(context.Context, *SetStatusRequest, *SetStatusResponse) error
+	PutOrderComment(context.Context, *SetCommentRequest, *SetCommentResponse) error
 }
 
 func RegisterGetUserOrderHandler(s server.Server, hdlr GetUserOrderHandler, opts ...server.HandlerOption) error {
 	type getUserOrder interface {
 		PostOrder(ctx context.Context, in *PostRequest, out *PostResponse) error
 		GetMyOrder(ctx context.Context, in *MyRequest, out *MyResponse) error
+		PutOrderStatus(ctx context.Context, in *SetStatusRequest, out *SetStatusResponse) error
+		PutOrderComment(ctx context.Context, in *SetCommentRequest, out *SetCommentResponse) error
 	}
 	type GetUserOrder struct {
 		getUserOrder
@@ -107,4 +133,12 @@ func (h *getUserOrderHandler) PostOrder(ctx context.Context, in *PostRequest, ou
 
 func (h *getUserOrderHandler) GetMyOrder(ctx context.Context, in *MyRequest, out *MyResponse) error {
 	return h.GetUserOrderHandler.GetMyOrder(ctx, in, out)
+}
+
+func (h *getUserOrderHandler) PutOrderStatus(ctx context.Context, in *SetStatusRequest, out *SetStatusResponse) error {
+	return h.GetUserOrderHandler.PutOrderStatus(ctx, in, out)
+}
+
+func (h *getUserOrderHandler) PutOrderComment(ctx context.Context, in *SetCommentRequest, out *SetCommentResponse) error {
+	return h.GetUserOrderHandler.PutOrderComment(ctx, in, out)
 }

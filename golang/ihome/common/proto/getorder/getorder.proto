@@ -7,6 +7,8 @@ option go_package = "./proto/getorder;getorder";
 service GetUserOrder {
 	rpc PostOrder(PostRequest) returns (PostResponse) {}
 	rpc GetMyOrder(MyRequest) returns (MyResponse) {}
+	rpc PutOrderStatus(SetStatusRequest) returns (SetStatusResponse) {} 
+	rpc PutOrderComment(SetCommentRequest) returns (SetCommentResponse) {} 
 }
 
 message PostRequest {
@@ -32,3 +34,24 @@ message MyResponse {
 	string errmsg = 2;
 	bytes orderjson = 3;	
 } 
+
+message SetStatusRequest {
+	int64 order_id = 1;
+	string action = 2;
+	string reason = 3;
+}
+
+message SetStatusResponse {
+	string errno = 1;
+	string errmsg = 2;	
+}
+
+message SetCommentRequest {
+	int64 order_id = 1;
+	string comment = 3;	
+}
+
+message SetCommentResponse {
+	string errno = 1;
+	string errmsg = 2;		
+}

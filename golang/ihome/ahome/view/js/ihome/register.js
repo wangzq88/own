@@ -70,6 +70,7 @@ function sendSMSCode() {
                     $(".phonecode-a").html(num+"秒");
                 }
             }, 1000, 60)
+            $("#phone-code-err span").html("验证码："+resp.code);
         } else {
             // 表示后端出现了错误，可以将错误信息展示到前端页面中
             $("#phone-code-err span").html(resp.errmsg);

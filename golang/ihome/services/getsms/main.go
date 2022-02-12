@@ -2,7 +2,8 @@ package main
 
 import (
 	"getsms/handler"
-	pb "getsms/proto"
+
+	pb "go.micro.srv/common/proto/getsms"
 
 	"github.com/micro/micro/v3/service"
 	"github.com/micro/micro/v3/service/logger"

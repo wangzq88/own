@@ -37,6 +37,9 @@ func main() {
 		r1.GET("/house/index", handler.GetIndex)
 		r1.POST("/orders", handler.PostOrders)
 		r1.GET("/user/orders", handler.GetOrders)
+		r1.PUT("/orders/:order_id/status", handler.SetOrderStatus)
+		r1.PUT("/orders/:order_id/comment", handler.SetComment)
+		r1.PUT("/user/name", handler.SetUserName)
 	}
 	router.Run(":10086")
 }

@@ -2,7 +2,8 @@ package main
 
 import (
 	"getarea/handler"
-	pb "getarea/proto"
+
+	pb "go.micro.srv/common/proto/getarea"
 
 	"github.com/micro/micro/v3/service"
 	"github.com/micro/micro/v3/service/logger"

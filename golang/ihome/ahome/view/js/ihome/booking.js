@@ -70,7 +70,7 @@ $(document).ready(function(){
             var startDate = $("#start-date").val();
             var endDate = $("#end-date").val();
             var data = {
-                "house_id":houseId,
+                "house_id":parseInt(houseId),
                 "start_date":startDate,
                 "end_date":endDate
             };

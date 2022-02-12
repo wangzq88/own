@@ -80,3 +80,16 @@ func (e *Getorder) PutOrderStatus(ctx context.Context, req *getorder.SetStatusRe
 	rsp.Errmsg = utils.RecodeText(utils.RECODE_OK)
 	return nil
 }
+
+func (e *Getorder) PutOrderComment(ctx context.Context, req *getorder.SetCommentRequest, rsp *getorder.SetCommentResponse) error {
+	log.Info("Received Getorder.PutOrderStatus request")
+	err := model.AddOrderComment(req.OrderId, req.Comment)
+	if err != nil {
+		rsp.Errno = utils.RECODE_DBERR
+		rsp.Errmsg = utils.RecodeText(utils.RECODE_DBERR)
+		return nil
+	}
+	rsp.Errno = utils.RECODE_OK
+	rsp.Errmsg = utils.RecodeText(utils.RECODE_OK)
+	return nil
+}

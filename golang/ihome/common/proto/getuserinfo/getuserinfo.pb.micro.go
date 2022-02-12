@@ -45,6 +45,7 @@ type GetuserinfoService interface {
 	Getuserinfocd(ctx context.Context, in *Request, opts ...client.CallOption) (*Response, error)
 	UploadAvatar(ctx context.Context, in *UploadReq, opts ...client.CallOption) (*UploadResp, error)
 	GetUserHouses(ctx context.Context, in *HousesRequest, opts ...client.CallOption) (*HousesResponse, error)
+	PutUserName(ctx context.Context, in *SetNameRequest, opts ...client.CallOption) (*SetNameResponse, error)
 }
 
 type getuserinfoService struct {
@@ -89,12 +90,23 @@ func (c *getuserinfoService) GetUserHouses(ctx context.Context, in *HousesReques
 	return out, nil
 }
 
+func (c *getuserinfoService) PutUserName(ctx context.Context, in *SetNameRequest, opts ...client.CallOption) (*SetNameResponse, error) {
+	req := c.c.NewRequest(c.name, "Getuserinfo.PutUserName", in)
+	out := new(SetNameResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for Getuserinfo service
 
 type GetuserinfoHandler interface {
 	Getuserinfocd(context.Context, *Request, *Response) error
 	UploadAvatar(context.Context, *UploadReq, *UploadResp) error
 	GetUserHouses(context.Context, *HousesRequest, *HousesResponse) error
+	PutUserName(context.Context, *SetNameRequest, *SetNameResponse) error
 }
 
 func RegisterGetuserinfoHandler(s server.Server, hdlr GetuserinfoHandler, opts ...server.HandlerOption) error {
@@ -102,6 +114,7 @@ func RegisterGetuserinfoHandler(s server.Server, hdlr GetuserinfoHandler, opts .
 		Getuserinfocd(ctx context.Context, in *Request, out *Response) error
 		UploadAvatar(ctx context.Context, in *UploadReq, out *UploadResp) error
 		GetUserHouses(ctx context.Context, in *HousesRequest, out *HousesResponse) error
+		PutUserName(ctx context.Context, in *SetNameRequest, out *SetNameResponse) error
 	}
 	type Getuserinfo struct {
 		getuserinfo
@@ -124,4 +137,8 @@ func (h *getuserinfoHandler) UploadAvatar(ctx context.Context, in *UploadReq, ou
 
 func (h *getuserinfoHandler) GetUserHouses(ctx context.Context, in *HousesRequest, out *HousesResponse) error {
 	return h.GetuserinfoHandler.GetUserHouses(ctx, in, out)
+}
+
+func (h *getuserinfoHandler) PutUserName(ctx context.Context, in *SetNameRequest, out *SetNameResponse) error {
+	return h.GetuserinfoHandler.PutUserName(ctx, in, out)
 }

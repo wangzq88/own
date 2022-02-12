@@ -4,12 +4,12 @@ import (
 	"context"
 	"crypto/sha256"
 	"fmt"
-	"postlogin/utils"
 
 	log "github.com/micro/micro/v3/service/logger"
 
-	"postlogin/model"
-	postlogin "postlogin/proto"
+	"go.micro.srv/common/model"
+	"go.micro.srv/common/proto/postlogin"
+	"go.micro.srv/common/utils"
 )
 
 type Postlogin struct{}

@@ -3,14 +3,13 @@ package handler
 import (
 	"context"
 	"crypto/sha256"
-	"errors"
 	"fmt"
 
 	log "github.com/micro/micro/v3/service/logger"
 
-	"postret/model"
-	postret "postret/proto"
-	"postret/utils"
+	"go.micro.srv/common/model"
+	"go.micro.srv/common/proto/postret"
+	"go.micro.srv/common/utils"
 )
 
 type Postret struct{}
@@ -24,13 +23,15 @@ func (e *Postret) Register(ctx context.Context, req *postret.Request, rsp *postr
 	if err != nil {
 		rsp.Errno = utils.RECODE_DATAERR
 		rsp.Errmsg = utils.RecodeText(utils.RECODE_DATAERR)
-		return err
+		//return err
+		return nil
 	}
 
 	if smsCode != req.SmsCode {
 		rsp.Errno = utils.RECODE_SMSERR
 		rsp.Errmsg = utils.RecodeText(utils.RECODE_SMSERR)
-		return errors.New("验证码错误")
+		//return errors.New("验证码错误")
+		return nil
 	}
 
 	//存储用户数据到Mysql上
@@ -44,7 +45,8 @@ func (e *Postret) Register(ctx context.Context, req *postret.Request, rsp *postr
 	if err != nil {
 		rsp.Errno = utils.RECODE_DBERR
 		rsp.Errmsg = utils.RecodeText(utils.RECODE_DBERR)
-		return err
+		//return err
+		return nil
 	}
 	sessByte := sha256.Sum256([]byte(req.Mobile))
 	sessionid := fmt.Sprintf("%x", string(sessByte[:]))
