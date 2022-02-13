@@ -20,9 +20,9 @@ shell 脚本 ihome.sh 是启动各个服务的脚本，由于在运行 `micro ru
 ```sh
 # Download latest proto releaes
 # https://github.com/protocolbuffers/protobuf/releases
-go get github.com/golang/protobuf/protoc-gen-go
-go get github.com/micro/micro/v3/cmd/protoc-gen-micro
-go get github.com/micro/micro/v3
+$ go get github.com/golang/protobuf/protoc-gen-go
+$ go get github.com/micro/micro/v3/cmd/protoc-gen-micro
+$ go get github.com/micro/micro/v3
 ```
 
 ## 运行服务
@@ -30,7 +30,7 @@ go get github.com/micro/micro/v3
 启动micro相关的服务进程
 
 ```sh
-micro server
+$ micro server
 ```
 
 接下来需要登录账号，做身份验证。**不然后续操作会出现提示运行服务权限不足问题**。username固定为admin,password固定为micro
@@ -59,10 +59,16 @@ server
 store
 ```
 
-接下来切换到项目 ihome 的目录下，运行 `./ihome.sh` 脚本启动爱家租房的服务。也可以逐个切换到 ahome 目录，services 下的各个子目录运行以下命令启动爱家租房的服务，效果等同。
+接下来切换到项目 ihome 的目录下，运行 `./ihome.sh` 脚本启动爱家租房的服务。
+
+![20220213224320](attachment\20220213224320.png)
+
+如果出现 `Rpc error: code = Canceled desc = grpc: the client connection is closing`的错误，说明提示信息下一行的服务没有启动成功，可输入 `micro logs postauth` 查看服务日志信息。再到该服务目录单独启动服务，`micro run .`
+
+也可以逐个切换到 ahome 目录，services 下的各个子目录运行以下命令启动爱家租房的服务，效果等同。
 
 ```sh
-micro run .
+$ micro run .
 ```
 
 查看爱家租房的微服务，输入以下命令
@@ -92,7 +98,7 @@ $ micro logs ahome
 停止某个微服务，ahome 为我们项目的服务
 
 ```sh
-micro kill ahome
+$ micro kill ahome
 ```
 
 官方go-micro 3.0 的上手文档：https://micro.dev/getting-started

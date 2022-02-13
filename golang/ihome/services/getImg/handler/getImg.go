@@ -2,11 +2,11 @@ package handler
 
 import (
 	"context"
-	"getImg/model"
-	"getImg/proto"
 	"image/color"
 
-	utils "getImg/utils"
+	"go.micro.srv/common/model"
+	proto "go.micro.srv/common/proto/getimg"
+	"go.micro.srv/common/utils"
 
 	"github.com/afocus/captcha"
 	log "github.com/micro/micro/v3/service/logger"
