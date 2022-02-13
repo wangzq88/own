@@ -411,7 +411,7 @@ func GetUserHouses(ctx *gin.Context) {
 			"room_count":  value.Room_count,
 			"order_count": value.Order_count,
 			"address":     value.Address,
-			"user_avatar": houseData.User.Avatar_url,
+			"user_avatar": "http://" + model.AvatarDomain + "/" + houseData.User.Avatar_url,
 			"ctime":       value.CreatedAt,
 		}
 		houseList = append(houseList, house_info)
