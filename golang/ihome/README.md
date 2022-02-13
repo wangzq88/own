@@ -17,7 +17,7 @@ shell 脚本 ihome.sh 是启动各个服务的脚本，由于在运行 `micro ru
 
 ## 安装
 
-```
+```sh
 # Download latest proto releaes
 # https://github.com/protocolbuffers/protobuf/releases
 go get github.com/golang/protobuf/protoc-gen-go
@@ -29,13 +29,13 @@ go get github.com/micro/micro/v3
 
 启动micro相关的服务进程
 
-```
+```sh
 micro server
 ```
 
 接下来需要登录账号，做身份验证。**不然后续操作会出现提示运行服务权限不足问题**。username固定为admin,password固定为micro
 
-```
+```sh
 $ micro login
 Enter username: admin
 Enter password:
@@ -44,7 +44,7 @@ Successfully logged in.
 
 查看运行哪些服务
 
-```
+```sh
 $ micro services
 api
 auth
@@ -61,13 +61,13 @@ store
 
 接下来切换到项目 ihome 的目录下，运行 `./ihome.sh` 脚本启动爱家租房的服务。也可以逐个切换到 ahome 目录，services 下的各个子目录运行以下命令启动爱家租房的服务，效果等同。
 
-```
+```sh
 micro run .
 ```
 
 查看爱家租房的微服务，输入以下命令
 
-```
+```sh
 $ micro status
 NAME            VERSION SOURCE                                  STATUS  BUILD   UPDATED         METADATA
 ahome           latest  /home/www/go/src/ahome                  running n/a     51m39s ago      owner=admin, group=micro
@@ -85,13 +85,13 @@ postret         latest  /home/www/go/src/services/postret       running n/a     
 
 查看某个微服务的日志输出，ahome 为我们项目的服务
 
-```
+```sh
 $ micro logs ahome
 ```
 
 停止某个微服务，ahome 为我们项目的服务
 
-```
+```sh
 micro kill ahome
 ```
 
