@@ -140,7 +140,9 @@ appium扩展了WebDriver的协议
 pip install Appium-Python-Client
 ```
 
+##### 安装 appium-inspector
 
+到 [github](https://github.com/appium/appium-inspector/tags) 下载压缩包。随着Appium Desktop升级到1.22.0版本，服务和元素查看器已经分开了，查看元素信息就需要下载Appium Inspector。参考资料：[Appium-Inspector安装及使用方法](https://blog.csdn.net/delia_1/article/details/122247259)
 
 ### 三、安装夜神模拟器（Android 模拟器）
 
@@ -165,3 +167,93 @@ pip install Appium-Python-Client
 参见：https://developer.android.google.cn/studio/releases/platforms?hl=zh-cn
 
 https://www.runoob.com/w3cnote/android-tutorial-development-environment-build.html
+
+**什么是uiautomator**
+
+Android 4.3发布的时候发布的测试工具。uiautomator是用来做UI测试的。也就是普通的手工测试，点击每个控件元素看看输出的结果是否符合预期。比如登陆界面分别输入正确和错误的用户名密码，然后点击登陆按钮看看是否能否登陆以及是否有错误提示等
+
+**uiautomator工具的组成**
+
+uiautomatorviewer — 一个图形界面工具来扫描和分析应用的UI控件。存放在tools目录
+
+uiautomator — 一个测试的Java库，包含了创建UI测试的各种API和执行自动化测试的引擎。
+
+uiautomator 在 Android Sdk 目录里  C:\Users\linzh\AppData\Local\Android\sdk\tools\bin
+
+## 配置
+
+打开 main.py 文件，定位到以下代码
+
+```
+desired_caps = {}
+desired_caps['platformName'] = 'Android'
+desired_caps['deviceName'] = '127.0.0.1:62025'
+desired_caps['platformVersion'] = '5.1.1'
+desired_caps['appPackage'] = 'com.ss.android.ugc.live'
+desired_caps['appActivity'] = '.main.MainActivity'
+desired_caps['noReset'] = True
+desired_caps['unicodeKeyboard'] = True
+desired_caps['resetKeyboard'] = True
+```
+
+desired capability 的功能是配置Appium会话。他们告诉Appium服务 器您想要自动化的平台和应用程序。
+
+[常用Capability配置讲解](https://www.zhihu.com/question/21453695?sort=created#:~:text=Desired,Capabilities%E6%98%AF%E4%B8%80%E7%BB%84%E8%AE%BE%E7%BD%AE%E7%9A%84%E9%94%AE%E5%80%BC%E5%AF%B9%E7%9A%84%E9%9B%86%E5%90%88%EF%BC%8C%E5%85%B6%E4%B8%AD%E9%94%AE%E5%AF%B9%E5%BA%94%E8%AE%BE%E7%BD%AE%E7%9A%84%E5%90%8D%E7%A7%B0%EF%BC%8C%E8%80%8C%E5%80%BC%E5%AF%B9%E5%BA%94%E8%AE%BE%E7%BD%AE%E7%9A%84%E5%80%BC%E3%80%82)
+
+adb（Android Debug Bridge）是一个通用命令行工具，其允许您与模拟器实例或连接的 Android 设备进行通信。它可为各种设备操作提供便利如安装和调试应用。
+
+**关于 deviceName 的获取**，查看 [ADB 命令大全](https://zhuanlan.zhihu.com/p/89060003)，就能查看到 `deviceName` 的值。模拟器实例或连接的 Android 设备要*启用开发者模式*，并且*允许USB调试模式*
+
+```sh
+$ adb devices
+```
+
+如果出现类似的错误信息
+
+```
+adb server version (36) doesn't match this client (40); killing... 
+```
+
+把`Android SDK` 目录下的 `platform-tools` 目录下的 `adb.exe` ，`AdbWinApi.dll` ，`AdbWinUsbApi.dll` 这三个文件复制替换夜神模拟器安装目录下 `C:\Program Files (x86)\Nox\bin` 的同样三个文件。
+
+把目录下`C:\Program Files (x86)\Nox\bin` 的 `nox_adb.exe` 备份为 `nox_adb_bak.exe`，把 `adb.exe` 复制一份改为 nox_adb.exe。
+
+这样操作之后版本就一致了，不会出现上面那个错误。重启安卓模拟器，再次输入 `adb devices`，就可以看到连接的安卓设备了
+
+进入设备的底层操作系统
+
+```sh
+$ adb -s  127.0.0.1:62025 shell  
+```
+
+**关于 appPackage 和 appActivity 的获取**，有两种方式进行查看。
+
+1.通过 `aapt`，在 Android SDK 目录里的 build-tools 目录里面有个 aapt 工具 
+
+```sh
+$ aapt dump badging  XXX.apk
+```
+
+XXX.apk 是APP的包名，输出的信息第一行信息就包含有 appPackage 的信息
+
+在输出的信息找到 `launchable-activity` 里 `name` 的值就是 appActivity  的信息，或者输入以下信息
+
+```
+aapt dump badging  XXX.apk | find "launchable-activity"
+```
+
+2.通过 `adb shell` 。
+
+```sh
+$ adb shell  
+```
+
+会进入到 Android 操作系统命令行界面
+
+```sh
+# logcat | grep cmp=
+```
+
+然后打开夜神模拟器（安卓模拟器），打开要抓取的 app，查找到有 `cmp=` 的信息，就可以看到 `appPackage` 和 `appActivity`  了
+
+<img src="attachment\20220215124600.png" alt="20220215124600" style="zoom:50%;" />
