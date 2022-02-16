@@ -170,15 +170,51 @@ https://www.runoob.com/w3cnote/android-tutorial-development-environment-build.ht
 
 **什么是uiautomator**
 
+类似于网页查看元素的工具
+
 Android 4.3发布的时候发布的测试工具。uiautomator是用来做UI测试的。也就是普通的手工测试，点击每个控件元素看看输出的结果是否符合预期。比如登陆界面分别输入正确和错误的用户名密码，然后点击登陆按钮看看是否能否登陆以及是否有错误提示等
 
 **uiautomator工具的组成**
 
-uiautomatorviewer — 一个图形界面工具来扫描和分析应用的UI控件。存放在tools目录
+uiautomatorviewer —— 一个图形界面工具来扫描和分析应用的UI控件。存放在tools目录
 
-uiautomator — 一个测试的Java库，包含了创建UI测试的各种API和执行自动化测试的引擎。
+uiautomator —— 一个测试的Java库，包含了创建UI测试的各种API和执行自动化测试的引擎。
 
 uiautomator 在 Android Sdk 目录里  C:\Users\linzh\AppData\Local\Android\sdk\tools\bin
+
+uiautomator 没有提供类似 xpath 路径，所以可以用第三方插件破解升级一下
+
+### 五、安装xponsed框架 + JustTruestMe组件
+
+由于打开抓包工具，抖音火山版会连不上网，这是由于校验服务端的证书无法通过，打开抓包工具会进行中间人劫持，APP发出的数据被抓包工具截获了，然后抓包工具内置的证书进行加密，传输到抖音的服务器，服务器发现发送过来的数据并不是熟悉的算法和熟悉的证书，所以就拒绝了数据的返回。这就需要安装 xponsed框架 + JustTruestMe 组件来突破 SSL Pinning。
+
+SSL Pinning，即SSL证书绑定，是验证服务器身份的一种方式，是在https协议建立通信时增加的代码逻辑，它通过自己的方式验证服务器身份，然后决定通信是否继续下去。它唯一指定了服务器的身份，所以安全性较高。
+
+https 验证服务器的身份有三种
+
+1、根据浏览器或者说操作系统（Android）自带的证书链（需要到证书机构购买证书）
+
+2、二是使用自签名证书（多见于局域网、内网使用）
+
+3、三是自签名证书加上SSL Pinning特性（安全性最高的，需要客户端或者浏览器添加SSL Pinning特性）
+
+Xposed是一个框架，它可以改变系统和应用程序的行为，而不接触任何APK。它支持很多模块，每个模块可以用来帮助实现不同的功能。
+
+JustTrustMe是一个用来禁用、绕过SSL证书检查的，它基于Xposed 模块。 JustTrustMe是将APK中所有用于校验SSL证书的API都进行了 屏蔽，从而绕过证书检查。
+
+**注意事项：**
+
+手机必须获取root权限
+
+安装xposed框架有手机变砖危险！！！手机可以直接刷带有xposed框架的系统
+
+目前 xposed框架 支持 android 最高版本只到 5.0
+
+[xposed 框架下载](https://repo.xposed.info/module/de.robv.android.xposed.installer)
+
+[JustTrustMe下载](https://github.com/Fuzion24/JustTrustMe/releases)
+
+[安装参见此链接](https://crifan.github.io/app_capture_package_tool_charles/website/how_capture_app/complex_https/https_ssl_pinning/root_android_xposed_justtrustme.html)
 
 ## 配置
 
