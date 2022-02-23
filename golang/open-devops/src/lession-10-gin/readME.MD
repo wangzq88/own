@@ -57,3 +57,5 @@ dmidecode -s system-serial-number |tail -n 1
 **用 md5 生成函数**
 
 models/resource_host.go
+
+**如何将 gin 整合到 net/http 包中**
