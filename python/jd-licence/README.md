@@ -28,4 +28,4 @@
 
 用到 ddddocr 库识别图像验证码
 
-<img src="C:\phpstudy_pro\WWW\own\python\jd-licence\attachment\attachment.png" alt="attachment" style="zoom:60%;" />
+<img src="attachment/attachment.png" alt="attachment" style="zoom:60%;" />
