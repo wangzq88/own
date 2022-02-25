@@ -18,5 +18,6 @@ func (r *RpcCli) HostInfoReport(info models.AgentCollectInfo) {
 		level.Error(r.logger).Log("msg", "Server.HostInfoReport.error", "serverAddr", r.ServerAddr, "err", err)
 		return
 	}
+	level.Info(r.logger).Log("msg", "Server.HostInfoReport.info", "serverAddr", r.ServerAddr, "info", msg)
 
 }
