@@ -1,4 +1,7 @@
+
+
 # 爱家租房
+
 ## 基本介绍
 
 爱家租房是用微服务框架go-micro 3.0 和Gin框架搭建的项目
@@ -133,6 +136,12 @@ getuserinfo     latest  /home/www/go/src/services/getuserinfo   running n/a     
 postauth        latest  /home/www/go/src/services/postauth      running n/a     50m2s ago       owner=admin, group=micro
 postlogin       latest  /home/www/go/src/services/postlogin     running n/a     47s ago         owner=admin, group=micro
 postret         latest  /home/www/go/src/services/postret       running n/a     49m12s ago      owner=admin, group=micro
+```
+
+或者用以下命令查看微服务详情
+
+```
+micro stats --all custom
 ```
 
 查看某个微服务的日志输出，ahome 为我们项目的服务
