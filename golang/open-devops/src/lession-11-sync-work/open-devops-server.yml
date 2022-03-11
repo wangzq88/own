@@ -1,0 +1,10 @@
+mysql_s:
+  - name: stree
+    addr: "root:root@tcp(127.0.0.1:3306)/open_devops?charset=utf8&parseTime=True&loc=Asia%2FShanghai"
+    max: 128
+    idel: 16
+    debug: false
+rpc_addr: :9999
+http_addr: :9998
+public_cloud_sync:
+  enable: true

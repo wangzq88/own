@@ -5,7 +5,7 @@ import (
 	"github.com/go-kit/log"
 	"github.com/gin-gonic/gin"
 	"open-devops/src/common"
-	"open-devops/src/lession-10-gin/models"
+	"open-devops/src/lession-11-sync-work/models"
 	"strings"
 	"time"
 )

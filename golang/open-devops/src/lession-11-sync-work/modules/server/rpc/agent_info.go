@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"open-devops/src/lession-10-gin/models"
+	"open-devops/src/lession-11-sync-work/models"
 )
 
 func (*Server) HostInfoReport(input models.AgentCollectInfo, output *string) error {

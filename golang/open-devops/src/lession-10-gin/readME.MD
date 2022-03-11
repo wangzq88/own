@@ -1,4 +1,4 @@
-# xorm不允许 db结构体字段嵌套 xorm如何存json
+# node_path操作的函数添加gin的支持
 
 ## 启动 server 端
 
@@ -59,3 +59,29 @@ dmidecode -s system-serial-number |tail -n 1
 models/resource_host.go
 
 **如何将 gin 整合到 net/http 包中**
+
+## Postman 验证
+
+**增加 nodepath**
+
+url:  http://129.226.134.90:9998/api/v1/node-path     
+
+method: post
+
+Body: {"node": "a1.b1.c1"}
+
+**查询 nodepath**
+
+url:  http://129.226.134.90:9998/api/v1/node-path     
+
+method: post
+
+Body: {"node": "a1","query_type":2}
+
+
+
+url: http://129.226.134.90:9998/api/v1/resource-unmount
+
+method: delete
+
+Body: {"target_path": "waimai.ditu.es","resource_type":"resource_host","resource_ids":[1]}
